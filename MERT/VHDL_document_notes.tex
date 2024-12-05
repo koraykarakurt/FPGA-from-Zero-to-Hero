@@ -1,0 +1,227 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{titlesec}
+\usepackage{enumitem}
+
+\title{False Paths Sprint-2 IEEE 1076-2019 VHDL Manual Review}
+\author{Mert Ecevit}
+\date{Edited at 05.12.2024}
+
+\begin{document}
+	
+	\maketitle
+	\begin{center}
+		\textbf{Review and Taken Notes of the Document} \\
+		\vspace{1em}
+		\textit{Project Leader: Koray Karakurt}
+	\end{center}
+	
+	\newpage
+	
+	\section*{Chapter 3 Review and Notes}
+	
+	\subsection*{3.2 Entity Declarations}
+	\begin{itemize}[noitemsep]
+		\item The entity declaration provides an external view of a component but does not provide information about how a component is implemented.
+		\item An entity declaration defines the interface between a given design entity and the environment in which it is used.
+		\item A given entity declaration may be shared by many design entities, each of which has a different architecture.
+		\item The entity declarative part of a given entity declaration declares items that are common to all design entities whose interfaces are defined by the given entity declaration.
+		\item The entity statement part contains concurrent statements that are common to each design entity with this interface.
+		\item All entity statements shall be passive. Such statements may be used to monitor the operating conditions or characteristics of a design entity.
+	\end{itemize}
+	
+	\subsection*{3.3 Architecture Declarations}
+	\begin{itemize}[noitemsep]
+		\item An architecture provides an “internal” view of an entity. An entity may have more than one architecture.
+		\item It defines the relationships between the inputs and the outputs of a design entity which may be expressed in terms of:
+		\begin{itemize}[noitemsep]
+			\item Behavioural style
+			\item Data flow style
+			\item Structural style
+		\end{itemize}
+		\item An architecture determines the function of an entity.
+		\item It consists of a declaration section where signals, types, constants, components, and subprograms are declared, followed by a collection of concurrent statements.
+		\item More than one architecture body may exist corresponding to a given entity declaration.
+		\item Each declares a different body with the same interface; thus, each together with the entity declaration represents a different design entity with the same interface.
+		\item The architecture statement part contains statements that describe the internal organization and/or operation of the block defined by the design entity.
+		\item All of the statements in the architecture statement part are concurrent statements, which execute asynchronously with respect to one another.
+	\end{itemize}
+	
+	\subsection*{3.4 Configuration Declarations}
+	\begin{itemize}[noitemsep]
+		\item During the design process, a designer may want to experiment with different variations of a design by selecting different architectures.
+		\item Configurations can be used to provide fast substitutions of component instances of a structural design.
+	\end{itemize}
+	
+	\subsubsection*{3.4.1 Block Configurations}
+	\begin{itemize}[noitemsep]
+		\item Blocks are used to organise a set of concurrent statements hierarchically.
+	\end{itemize}
+	
+	\subsubsection*{3.4.2 Component Configurations}
+	\begin{itemize}
+		\item A component declaration is required to make a design entity useable within the current design.
+	\end{itemize}
+	
+	\section*{Chapter 4 Review and Notes}
+	\subsection*{4.2 Subprogram Declarations}
+	\begin{itemize}
+		\item Subprograms consist of procedures and functions that can be invoked repeatedly from different locations in a VHDL description
+		\item VHDL provides two kinds of subprograms : Procedures and Functions
+		\item Note: Different from 1076-2002 Document The properties of implicitly declared subtypes denoted by return identifier added in this section.
+	\end{itemize}
+	
+	\subsection*{4.3 Subprogram Bodies}
+	\begin{itemize}
+		\item A subprogram body specifies the execution of a subprogram
+		\item The declaration of subprogram is optional, in absence of that subprogram specification acts as declaration
+		\item It is an error if subprogram declarative part declares a shared variable.
+	\end{itemize}
+	
+	\subsection*{4.4 Subprogram Instantiation Declarations}
+	\begin{itemize}
+		\item \textbf{Note :} This section is is absent in 1076-2002 Document
+		\item The uninstantiated subprogram name shall denote an uninstantiated subprogram declared in a subprogram	declaration
+		\item Subprogram instantiations is creating anonymous subprograms which allows you to declare and use subprograms  directly within the body of another construct, such as an architecture, without needing a separate named declaration.
+	\end{itemize}
+	
+	\subsection*{4.5 Subprogram Overloading}
+	\begin{itemize}
+		\item  If the two subprogram names match, the parameter set/return values have to differ. This is called overloading and is allowed for all subprograms. It is especially useful when applied to operators, which can be seen as functions with a special name
+		\item This allows, for example, to use the conventional ’+’ symbol for the addition of integer values and, likewise, with bit vectors that should be interpreted as numbers
+	\end{itemize}
+	
+	\subsubsection*{4.5.3 Signatures}
+	\begin{itemize}
+		\item A signature distinguishes between overloaded subprograms and enumerationliterals based on their parameter and result type profiles. A signature may be used in an attribute name, entity designator or alias declaration.
+	\end{itemize}
+	
+	\subsection*{4.6 Resolution Functions}
+	\begin{itemize}
+		\item A resolution function defines how values from multiple sources, multiple drivers, are resolved into a single value.
+		\item A type or a signal may be defined to have a resolution. This type or signal uses the resolution functions when there are multiple drivers.
+	\end{itemize}
+	
+	\subsection*{4.7 Package Declarations}
+	\begin{itemize}
+		\item The primary purpose of a package is to collect elements that can be shared among two or more design units.
+		\item  It contains some common data types, constants, and subprogram specifications.
+		\item A package declaration declares all the names of items that will be seen by the design units that use the package
+	\end{itemize}
+	
+	\subsection*{4.8 Package Bodies}
+	\begin{itemize}
+		\item A package body contains the implementation details of the subprograms declared in the package declaration.
+		\item A package body is not required if no subprograms are declared in a package declaration.
+		\item The separation between package declaration and package body serves thesame purpose as the separation between the entity declaration and architecture body.
+	\end{itemize}
+	
+	\subsection*{4.9 Package Instantiation Declarations}
+	\begin{itemize}
+		\item \textbf{Note :} This section is added in VHDL 1076-2008 document
+		\item A package with a generic list is called an uninstantiated package
+		\item The uninstantiated package serves as a form of template that we must instantiate separately.
+		\item Uninstantiated packages and package instances that are declared as design units and stored in a design library, they  can be written as a further form of design unit
+	\end{itemize}
+	
+	\subsection*{4.10 Conformance Rules}
+	\begin{itemize}
+		\item Two specifications for one subprogram are conform if 
+		\begin{itemize}
+			\item A numeric literal can be replaced by a different numeric literal if and only if both have the same
+			value.
+			\item A simple name can be replaced by an expanded name in which this simple name is the suffix if, and
+			only if, at both places the meaning of the simple name is given by the same declaration.
+		\end{itemize}
+		both specifications are made up of the same sequence of lexical elements and corresponding lexical elements have the same meaning
+	\end{itemize}
+	
+	\section*{Chapter 5 Review and Notes}
+	Data types are crucial to the modeling and manipulation of data in the hardware design in VHDL
+	
+	\subsection*{5.2 Scalar Types}
+	\begin{itemize}
+		\item Scalar types consist of enumeration types, integer types, physical types, and floating-point types
+		\item Enumeration types and integer types are called discrete types. 
+		\item Integer types, floating-point types, and physical types are called numeric types.
+	\end{itemize}
+	
+	\subsubsection*{5.2.2 Enumeration types}
+	\begin{itemize}
+		\item In VHDL, enumeration data types let you provide a collection of named values.
+	\end{itemize}
+	
+	\subsubsection*{5.2.3 Integer Types}
+	\begin{itemize}
+		\item The signed integers that fall inside a given range are represented by the integer data type
+	\end{itemize}
+	
+	\subsubsection*{5.2.4 Physical Types}
+	\begin{itemize}
+		\item Physical type is a numeric scalar that represents some quantity
+	\end{itemize}
+	
+	\subsubsection*{5.2.5 Floating-Point Types}
+	\begin{itemize}
+		\item Floating point type provides an approximation of the real number value.
+	\end{itemize}
+	
+	\subsection*{5.3 Composite Types}
+	\begin{itemize}
+		\item A composite type object is one having multiple elements
+	\end{itemize}
+	
+	\subsubsection*{5.3.2 Array Type}
+	\begin{itemize}
+		\item Collections of the same data type elements are referred to as arrays in VHDL
+	\end{itemize}
+	
+	\subsubsection*{5.3.3 Record Type}
+	\begin{itemize}
+		\item Records define custom data types that contain multiple fields of different data types
+	\end{itemize}
+	
+	\subsection*{5.4 Access Types}
+	\begin{itemize}
+		\item Access type allows to manipulate data, which are created dynamically during simulation and which exact size is not known in advance
+	\end{itemize}
+	
+	\subsection*{5.5 File Types}
+	\begin{itemize}
+		\item A type that provides access to objects containing a sequence of values of a given type
+	\end{itemize}
+	
+	\subsection*{5.6 Protection Types}
+	\begin{itemize}
+		\item Types which implements instantiatiable regions of sequential statements and have exclusive access to shared data
+	\end{itemize}
+	
+	\subsection*{5.7 String Representation}
+	\begin{itemize}
+		\item Character arrays are called strings. Used frequently to manipulate files or textual data.
+	\end{itemize}
+	
+	\subsection*{5.8 Unspecified Types}
+	\begin{itemize}
+		\item An unspecified type abstractly defines the type class for generics, ports, parameters, and external names
+	\end{itemize}
+	
+	\section*{Chapter 6 Review and Notes}
+	\begin{itemize}
+		\item Various declarations may be used in various design units.
+	\end{itemize}
+	
+	\subsection*{6.2 Type Declarations}
+	\begin{itemize}
+		\item Custom structures and types for more accurate data representation are made possible by type declarations, which establish new data types in VHDL.
+	\end{itemize}
+	
+	\subsection*{6.3 Subtype Declarations}
+	\begin{itemize}
+		\item A type together with a constraint.
+	\end{itemize}
+	
+	
+\end{document}
