@@ -1,0 +1,1 @@
+-- to be a self-checking testbench using vhdl report and assert keywords
