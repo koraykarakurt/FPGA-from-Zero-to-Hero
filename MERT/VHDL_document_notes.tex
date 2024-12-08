@@ -4,6 +4,7 @@
 \geometry{margin=1in}
 \usepackage{titlesec}
 \usepackage{enumitem}
+\usepackage{graphicx}
 
 \title{False Paths Sprint-2 IEEE 1076-2019 VHDL Manual Review}
 \author{Mert Ecevit}
@@ -222,6 +223,151 @@
 	\begin{itemize}
 		\item A type together with a constraint.
 	\end{itemize}
+	
+	\subsection*{6.4 Objects}
+	\begin{itemize}
+		\item Object are constants, signals and variables.
+	\end{itemize}
+	
+	\subsection*{6.5 Interface Declarations}
+	\begin{itemize}
+		\item Interface declarations define interface objects of a precisely defined type.
+		\item Interface objects are interface constants, interface signals, interface variables and interface files.
+	\end{itemize}
+	
+	\subsection*{6.6 Alias Declarations}
+	\begin{itemize}
+		\item An alias is an alternative name for an existing object (signal, variable or constant). They don't define a new object.
+	\end{itemize}
+	
+	\subsection*{6.7 Attribute Declarations}
+	\begin{itemize}
+		\item Attributes are user-defined properties attached to types, signals, entities, etc. They can store metadata or control simulation aspects.
+	\end{itemize}
+	
+	\subsection*{6.8 Component Declarations}
+	\begin{itemize}
+		\item Components act as templates for modules or logic blocks that can be instantiated multiple times in a design. This allows reusability and modular design.
+	\end{itemize}
+	
+	
+	
+	\section{Chapter 7 Review and Notes}
+	\begin{itemize}
+		\item In VHDL, Specifications are used to define additional information associated with entity in a design.
+	\end{itemize}
+	
+	\subsection*{7.2 Attribute Specifications}
+	\begin{itemize}
+		\item Attributes are a feature of VHDL that allow you to extract additional information about an object.
+	\end{itemize}
+	
+	\subsection*{7.3 Configuration Specifications}
+	\begin{itemize}
+		\item A VHDL configuration specification defines how instances of a specific component are connected and used in a design.
+		\item It associates component instances with binding information, determining the role of the component within the design structure.
+	\end{itemize}
+	
+	\subsection*{7.4 Disconnection Specification}
+	\begin{itemize}
+		\item A disconnection specification defines the time delay after which the driver of a guarded signal will automatically disconnect. It controls how long a signal remains active before it is disconnected.
+	\end{itemize}
+	
+	
+	
+	\section*{Chapter 8 Review and Notes}
+	\begin{itemize}
+		\item In code, names refer to various entities like objects, values, methods, attributes, or slices.
+	\end{itemize}
+	
+	\subsection*{8.2 Simple Names}
+	\begin{itemize}
+		\item While selected names denote a sub-element, simple names explicitly identify an item.
+	\end{itemize}
+	
+	\subsection*{8.3 Selected Names}
+	\begin{itemize}
+		\item When referring to an entity that is declared within another entity or a design library, selected names are utilized.
+	\end{itemize}
+	
+	\subsection*{8.4 Indexed Names}
+	\begin{itemize}
+		\item The indexed name indicates an element of an array, which is indicated by an expression list forming the array index.
+	\end{itemize}
+	
+	\subsection*{8.5 Slice Names}
+	\begin{itemize}
+		\item The slice name allows indicating a part of a one-dimensional array. The slice name is called a null slice if its discrete range is a null range
+	\end{itemize}
+	
+	\subsection*{8.6 Attribute Names}
+	\begin{itemize}
+		\item The attribute name consists of two elements: a prefix and an attribute designator
+	\end{itemize}
+	
+	\subsection*{8.7 External Names}
+	\begin{itemize}
+		\item An object designated in the design hierarchy that contains the external name is indicated by its external name.
+	\end{itemize}
+	
+	
+	\section*{Chapter 9 Review and Notes}
+	\begin{itemize}
+		\item A formula that defines the computation of a value.
+		\item The type of an expression depends only upon 
+		\begin{itemize}
+			\item The types of its operands 
+			\item On the operators applied
+		\end{itemize}
+		\item The operators that can be used in expressions are defined below:
+		% TODO: \usepackage{graphicx} required
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.7\linewidth]{"../../../../../Pictures/Screenshots/Ekran görüntüsü 2024-12-09 002158"}
+			\caption{}
+			\label{fig:ekran-goruntusu-2024-12-09-002158}
+		\end{figure}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.7\linewidth]{"../../../../../Pictures/Screenshots/Ekran görüntüsü 2024-12-09 002209"}
+			\caption{}
+			\label{fig:ekran-goruntusu-2024-12-09-002209}
+		\end{figure}
+		\begin{figure}
+			\centering
+			\includegraphics[width=0.7\linewidth]{"../../../../../Pictures/Screenshots/Ekran görüntüsü 2024-12-09 002215"}
+			\caption{}
+			\label{fig:ekran-goruntusu-2024-12-09-002215}
+		\end{figure}	
+	\end{itemize}
+	
+	\subsection*{9.3 Operands}
+	\begin{itemize}
+		\item The operands in an expression include names (that denote objects, values, or attributes that result in a value),
+		literals, aggregates, function calls, qualified expressions, type conversions, and allocators. In addition, an
+		expression enclosed in parentheses may be an operand in an expression.
+	\end{itemize}
+	
+	
+	\subsection*{9.4 Static Expressions}
+	\begin{itemize}
+		\item Utilized in constant declarations or restrictions; fully computed at compile time.
+		\item There are two categories of static expression:
+		\begin{itemize}
+			\item If every operator in expression is an implicit defined operator, these are called \textbf{locally static}  expressions
+			\item If every in the expression is a pure function and every primary in the expression is a global static primary, they are called \textbf{globally static}  expressions
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection*{9.5 Universal Expressions}
+	\begin{itemize}
+		\item A universal expression is either an expression that delivers a result of type universal integer or one that delivers a result of type \textbf{universal real}
+		\item The same operations are predefined for the type \textbf{universal integer} as for any integer type
+		\item The same operations are predefined for the type \textbf{universal real} as for any floating point type
+		\item In addition, these operations include the multiplication and division operators
+		
+	\end{itemize}
+	
 	
 	
 \end{document}
