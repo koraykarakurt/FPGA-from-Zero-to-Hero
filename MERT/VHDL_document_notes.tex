@@ -369,5 +369,102 @@
 	\end{itemize}
 	
 	
+	\section*{Chapter 10 Notes and Review}
+	
+	
+	\subsection*{Wait Statement}
+	\begin{itemize}
+		\item Causes execution of sequential statements to wait.
+		\item Includes optional sensitivity clause, condition clause, or timeout clause.
+	\end{itemize}
+	
+	\subsection*{Assertion Statement}
+	\begin{itemize}
+		\item Used for internal consistency checks or error message generation.
+		\item Can include an optional report string and severity name.
+		\item Predefined severity names: NOTE, WARNING, ERROR, FAILURE.
+		\item Default severity for assert is ERROR.
+	\end{itemize}
+	
+	\subsection*{Report Statement}
+	\begin{itemize}
+		\item Used to output messages.
+		\item Default severity name is NOTE.
+	\end{itemize}
+	
+	\subsection*{Signal Assignment Statement}
+	\begin{itemize}
+		\item Typically considered a concurrent statement but can be used sequentially.
+		\item Target is updated following specific delay mechanisms and waveforms.
+		\item Delay mechanisms include transport, reject, and inertial.
+		\item Waveforms can consist of values or nulls with optional delays.
+	\end{itemize}
+	
+	\subsection*{Variable Assignment Statement}
+	\begin{itemize}
+		\item Assigns the value of an expression to a target variable.
+	\end{itemize}
+	
+	\subsection*{Procedure Call Statement}
+	\begin{itemize}
+		\item Used to call a procedure.
+		\item Can include actual parameters with positional or named associations.
+	\end{itemize}
+	
+	\subsection*{If Statement}
+	\begin{itemize}
+		\item Implements conditional structures.
+		\item Can include optional \texttt{elsif} and \texttt{else} clauses.
+	\end{itemize}
+	
+	\subsection*{Case Statement}
+	\begin{itemize}
+		\item Executes one specific case of an expression equal to a choice.
+		\item Choices must be constants of the same discrete type as the expression.
+		\item Can include an optional \texttt{when others} clause if all choices are not covered.
+	\end{itemize}
+	
+	\subsection*{Loop Statement}
+	\begin{itemize}
+		\item Supports three kinds of iteration statements: simple, \texttt{for}, and \texttt{while}.
+		\item All loop types may include \texttt{next} and \texttt{exit} statements.
+	\end{itemize}
+	
+	\subsection*{Next Statement}
+	\begin{itemize}
+		\item Used in a loop to cause the next iteration.
+		\item May include an optional condition.
+	\end{itemize}
+	
+	\subsection*{Exit Statement}
+	\begin{itemize}
+		\item Used in a loop to immediately exit the loop.
+		\item May include an optional condition.
+	\end{itemize}
+	
+	\subsection*{Return Statement}
+	\begin{itemize}
+		\item Required in a function and optional in a procedure.
+		\item May include an optional expression to return a value.
+	\end{itemize}
+	
+	\subsection*{Null Statement}
+	\begin{itemize}
+		\item Used when a statement is needed but there is nothing to do.
+	\end{itemize}
+	
+	\subsection*{Sequential Block Statement}
+	\begin{itemize}
+		\item A sequential block statement encloses a sequence of sequential statements. Sequential block statements may
+		be nested.
+	\end{itemize}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 \end{document}
