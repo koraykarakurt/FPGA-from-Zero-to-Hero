@@ -320,7 +320,7 @@
 			\item On the operators applied
 		\end{itemize}
 		\item The operators that can be used in expressions are defined below:
-		% TODO: \usepackage{graphicx} required
+		
 		\begin{figure}
 			\centering
 			\includegraphics[width=0.7\linewidth]{"../../../../../Pictures/Screenshots/Ekran görüntüsü 2024-12-09 002158"}
@@ -372,27 +372,29 @@
 	\section*{Chapter 10 Notes and Review}
 	
 	
-	\subsection*{Wait Statement}
+	\subsection*{10.2 Wait Statement}
 	\begin{itemize}
 		\item Causes execution of sequential statements to wait.
 		\item Includes optional sensitivity clause, condition clause, or timeout clause.
 	\end{itemize}
 	
-	\subsection*{Assertion Statement}
+	\subsection*{10.3 Assertion Statement}
 	\begin{itemize}
 		\item Used for internal consistency checks or error message generation.
 		\item Can include an optional report string and severity name.
 		\item Predefined severity names: NOTE, WARNING, ERROR, FAILURE.
 		\item Default severity for assert is ERROR.
+		\item If the condition is not met, we say that an assertion violation has
+		occurred.
 	\end{itemize}
 	
-	\subsection*{Report Statement}
+	\subsection*{10.4 Report Statement}
 	\begin{itemize}
 		\item Used to output messages.
 		\item Default severity name is NOTE.
 	\end{itemize}
 	
-	\subsection*{Signal Assignment Statement}
+	\subsection*{10.5 Signal Assignment Statement}
 	\begin{itemize}
 		\item Typically considered a concurrent statement but can be used sequentially.
 		\item Target is updated following specific delay mechanisms and waveforms.
@@ -400,69 +402,163 @@
 		\item Waveforms can consist of values or nulls with optional delays.
 	\end{itemize}
 	
-	\subsection*{Variable Assignment Statement}
+	\subsection*{10.6 Variable Assignment Statement}
 	\begin{itemize}
 		\item Assigns the value of an expression to a target variable.
 	\end{itemize}
 	
-	\subsection*{Procedure Call Statement}
+	\subsection*{10.7 Procedure Call Statement}
 	\begin{itemize}
 		\item Used to call a procedure.
 		\item Can include actual parameters with positional or named associations.
 	\end{itemize}
 	
-	\subsection*{If Statement}
+	\subsection*{10.8 If Statement}
 	\begin{itemize}
 		\item Implements conditional structures.
 		\item Can include optional \texttt{elsif} and \texttt{else} clauses.
 	\end{itemize}
 	
-	\subsection*{Case Statement}
+	\subsection*{10.9 Case Statement}
 	\begin{itemize}
 		\item Executes one specific case of an expression equal to a choice.
 		\item Choices must be constants of the same discrete type as the expression.
 		\item Can include an optional \texttt{when others} clause if all choices are not covered.
 	\end{itemize}
 	
-	\subsection*{Loop Statement}
+	\subsection*{10.10 Loop Statement}
 	\begin{itemize}
 		\item Supports three kinds of iteration statements: simple, \texttt{for}, and \texttt{while}.
 		\item All loop types may include \texttt{next} and \texttt{exit} statements.
 	\end{itemize}
 	
-	\subsection*{Next Statement}
+	\subsection*{10.11 Next Statement}
 	\begin{itemize}
 		\item Used in a loop to cause the next iteration.
 		\item May include an optional condition.
 	\end{itemize}
 	
-	\subsection*{Exit Statement}
+	\subsection*{10.12 Exit Statement}
 	\begin{itemize}
 		\item Used in a loop to immediately exit the loop.
 		\item May include an optional condition.
 	\end{itemize}
 	
-	\subsection*{Return Statement}
+	\subsection*{10.14 Return Statement}
 	\begin{itemize}
 		\item Required in a function and optional in a procedure.
 		\item May include an optional expression to return a value.
 	\end{itemize}
 	
-	\subsection*{Null Statement}
+	\subsection*{10.15 Null Statement}
 	\begin{itemize}
 		\item Used when a statement is needed but there is nothing to do.
 	\end{itemize}
 	
-	\subsection*{Sequential Block Statement}
+	\subsection*{10.16 Sequential Block Statement}
 	\begin{itemize}
 		\item A sequential block statement encloses a sequence of sequential statements. Sequential block statements may
 		be nested.
 	\end{itemize}
 	
 	
+	\section*{Chapter 11 Review and Notes}
+	\begin{itemize}
+		\item The VHDL language models real systems as a set of subsystems that operate concurrently.
+		\item Concurrent statements are used to define interconnected blocks and processes that jointly describe the overall behavior or structure of a design.
+	\end{itemize}
 	
+	\subsection*{11.2 Block Statement}
+	\begin{itemize}
+		\item A block statement defines an internal block representing a portion of a design
+		\item Using of the block statement is supplying the limit the scope of the variables used within a portion of the code.
+		\item  This can significantly improve code readability in a large design where signals can be declared and utilized in the same region
+	\end{itemize}
 	
+	\subsection*{11.3 Process Statement}
+	\begin{itemize}
+		\item Processes are composed of sequential statements, but process declarations are concurrent statements.
+		\item It is executed in parallel with other processes.
+		\item It cannot contain concurrent statements.
+		\item It allows access to signals defined in the architecture in which the process appears and to those defined
+		in the entity to which the architecture is associated.
+	\end{itemize}
 	
+	\subsection*{11.4 Concurrent Procedure Call Statements}
+	\begin{itemize}
+		\item It is a shorthand notation commonly used for processes.
+		\item The body contains a sequential procedure but it is different from it, it is a concurrent statement.
+	\end{itemize}
+	
+	\subsection*{11.5 Concurrent Assertion Statements}
+	\begin{itemize}
+		\item A concurrent assertion statement represents a passive process statement containing the specified assertion
+		statement.
+		\item The syntax appears to be sequential assertion statement but it is a concurrent statements like concurrent procedure call statements
+	\end{itemize}
+	
+	\subsection*{11.6 Concurrent Signal Assignment Statements}
+	\begin{itemize}
+		\item Concurrent signal assignment statements are equivalent to sequential signal assignments contained in process statements
+		\item Unlike ordinary signal assignments, concurrent signal assignment statements can be included in the statement part of an architecture body.
+	\end{itemize}
+	
+	\subsection*{11.7 Component Instantiation Statements}
+	\begin{itemize}
+		\item Component instantiation allows you to instantiate one design unit (component) inside another design unit to create a hierarchically structured design description.
+		\item To perform component instantiation:
+		\begin{itemize}
+			\item Create the design unit (entity and architecture) modeling the functionality to be instantiated.
+			\item Declare the component to be instantiated in the declarative region of the parent design unit architecture.
+			\item Instantiate and connect this component in the architecture body of the parent design unit.
+			\item Map (connect) formal ports of the component to actual signals and ports of the parent design unit.
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection*{11.8 Generate Statements}
+	\begin{itemize}
+		\item Generate statements are used to accomplish one of two goals:
+		\begin{itemize}
+			\item Replicating Logic in VHDL
+			\item Turning on/off blocks of logic in VHDL
+		\end{itemize}
+		\item The generate keyword is always used in a combinational process or logic block.
+		\item It should not be driven with a clock.
+		\item If the digital designer wants to create replicated or expanded logic in VHDL, the generate statement with a for loop is the way to accomplish this task.
+		\item The second use case is very handy for debugging purposes, or for switching out different components without having to edit lots of code.
+		\item The designer needs to ensure that these generate blocks are mutually exclusive, such that no two can be active at the same time
+	\end{itemize}
+	
+	\section*{Chapter 12 Review and Notes}
+	\subsection*{12.1 Declerative Region}
+	\begin{itemize}
+		\item A declarative region in VHDL is a defined area where specific declarations are valid
+		\item Declarative regions are established by constructs like entity, architecture, process, block, package, component, and configuration, each forming its own scope
+	\end{itemize}
+	
+	\subsection*{12.2 Scope of Declarations}
+	\begin{itemize}
+		\item A declaration’s scope begins where it is declared and extends to the end of its nearest declarative region, defining where it can be used.
+		\item The immediate scope covers the area from the start of the declaration to the end of its nearest declarative region
+		\item Certain declarations, like those in package, record, subprogram parameters, or components (generic and port), can extend beyond their immediate scope, applying throughout their entire enclosing region or library
+	\end{itemize}
+	
+	\subsection*{12.3 Visibility}
+	\begin{itemize}
+		\item Visibility rules define which identifier is accessible within a certain area, and overloaded names are clarified by additional rules
+		\item Visibility can be achieved by selection (using use clauses) or directly, where identifiers are accessible in their immediate area unless hidden by another declaration with the same name
+	\end{itemize}
+	
+	\subsection*{12.4 Use Clause}
+	\begin{itemize}
+		\item The use clause makes names defined in a library directly visible within another region of the VHDL code
+		\item The visibility of a use clause starts right after it is written and continues to the end of its surrounding region, such as a design unit or configuration
+	\end{itemize}
+	
+	\subsection*{12.5 The context of overload resolution}
+	\begin{itemize}
+		\item Overload resolution defines the exact meaning of an identifier or operator when multiple meanings are possible, ensuring a single valid interpretation within a specific context.
+	\end{itemize}
 	
 	
 	
