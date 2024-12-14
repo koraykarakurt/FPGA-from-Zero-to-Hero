@@ -562,5 +562,130 @@
 	
 	
 	
+	\section*{Chapter 13 Review and Notes}
+	
+	\subsection*{13.1 Design Units}
+	\begin{itemize}
+		\item Certain constructs are independently analyzed and inserted into a design library; these constructs are called
+		design units
+	\end{itemize}
+	
+	\subsection*{13.2 Design Libraries}
+	\begin{itemize}
+		\item The results of a VHDL compilation (analyze) are kept inside of a library for subsequent simulation, for use as a component in other designs
+	\end{itemize}
+	
+	\subsection*{13.3 Context Declarations}
+	\begin{itemize}
+		\item A context declaration defines context items that may be referenced by design units.
+	\end{itemize}
+	
+	\subsection*{13.4 Context Clauses}
+	\begin{itemize}
+		\item A context clause defines the initial name environment in which a design unit is analyzed.
+	\end{itemize}
+	
+	\subsection*{13.5 Order of Analysis}
+	\begin{itemize}
+		\item The rules defining the order in which design units can be analyzed are direct consequences of the visibility
+		rules. 
+		\item Once you have analyzed all of the design units you need for a simulation run into a VHDL library, you can run the simulation
+	\end{itemize}
+	
+	
+	\subsection*{Chapter 14 Review and Notes}
+	\begin{itemize}
+		\item Definition of Elaboration of a block header:
+		\begin{itemize}
+			\item Purpose: Sets up the interface for each design block, including generics and ports
+			\item Generics: Assigns values to parameters that control block behavior, like bit widths or timing
+			\item Ports: Connects inputs and outputs to external signals or expressions
+		\end{itemize}	
+	\end{itemize}
+	
+	\begin{itemize}
+		\item Definition of Elaboration of a declarative part:
+		\begin{itemize}
+			\item Purpose: Prepares internal elements like signals, constants, and variables in each block
+			\item Declarations: Initializes constants, allocates memory for variables, and sets up signals
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{itemize}
+		\item Definition of Elaboration of a statement part:
+		\begin{itemize}
+			\item Purpose: Prepares executable statements for simulation, including both concurrent and sequential statements
+			\item Concurrent Statements: Includes signal assignments and processes that run simultaneously
+			\item Sequential Statements: Ordered operations within processes or subprograms
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{itemize}
+		\item Definition of Dynamic elaboration:
+		\begin{itemize}
+			\item Purpose: Manages runtime scenarios like deferred binding or conditional elaboration
+			\item Deferred Binding: Allows components to be bound conditionally, adapting to runtime states
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{itemize}
+		\item Definition of Execution of a model:
+		\begin{itemize}
+			\item Purpose: Simulates the design by executing concurrent and sequential statements over time
+		\end{itemize}
+	\end{itemize}
+	
+	
+	
+	\subsection*{Chapter 15 Review and Notes}
+	
+	\begin{itemize}
+		\item VHDL divides two main groups: graphic characters and format effectors
+		\begin{itemize}
+			\item Graphic Characters: Readability for users and compilers
+			\item Format Effectors: For visual layout (line breaks, tabs, and new lines
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection*{15.3 Lexical Elements}
+	Seperators:
+	\begin{itemize}
+		\item Separates lexical elements 
+		\item A separator is either a space character(SPACE or NBSP), a format effector, or the end of a line
+	\end{itemize}
+	
+	Delimiters:
+	\begin{itemize}
+		\item Delimiter characters separate different elements in the syntax of the language
+		\item The delimiters in VHDL are generally specific characters, and each one performs a specific function
+	\end{itemize}
+	
+	Identifiers:
+	\begin{itemize}
+		\item Basic identifiers ;
+		\begin{itemize}
+			\item Define signals, ports, and variables
+			\item Can Contain Letters, Digits, Underscores
+		\end{itemize} 
+		\item Extended Identifiers
+		\begin{itemize}
+			\item Define signals, ports, and variables
+			\item Case Sensitive
+			\item Enclosed in Backslashes
+			\item Enable the Inclusion of Special Characters 
+		\end{itemize}
+	\end{itemize}
+	
+	Literals:
+	\begin{itemize}
+		\item Abstract Literals: Represent values in basic numerical types.
+		\item Decimal Literals: Express numerical values (integer or fractional)
+		\item Based Literals: Specify numerical values in a specific base (binary, octal, hexadecimal).
+		\item Bit String Literals: Define numerical systems with specific bit sequences (B, O, X)
+		\item Character Literals: Represent a single character
+		\item String Literals: Represent a sequence of characters
+	\end{itemize}
+	
+	
 	
 \end{document}
