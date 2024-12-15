@@ -1,1 +1,0 @@
--- to have 2 generics, 1st generic (std_logic if '0' unsigned else signed) is for signed or unsigned multiplication, 2nd generic is for vector sizes of multipliers (mult_1, mult_2 both are std_logic_vectors)
