@@ -688,4 +688,105 @@
 	
 	
 	
+	
+	\section*{Chapter 16 Review and Notes}
+	\begin{itemize}
+		\item This section describes predefined attributes of VHDL, and the packages that all VHDL implementations shall provide.
+	\end{itemize}
+	
+	\subsection*{Predefined attributes}
+	\begin{itemize}
+		\item Predefined attributes denote values, functions, types, subtypes, mode views, signals and ranges associated with various kinds of named entities.
+	\end{itemize}
+	
+	
+	\subsection*{Active}
+	\begin{itemize}
+		\item When applied to a signal, this attribute works like a function call, returning true if s is active during the current simulation cycle and false if not
+	\end{itemize}
+	
+	\subsection*{Ascending}
+	\begin{itemize}
+		\item This attributes can be applied to scalar types or objects of them, including subtypes and aliases. It returns a boolean value that will be true if p has ascending range or false if it's descending.
+	\end{itemize}
+	
+	\subsection*{Base}
+	\begin{itemize}
+		\item When applied to an object, type, or subtype p, the base attribute returns the underlying type from which it originates. If there are multiple layers ıf subtypes, you get the root type that's not a subtype.
+		\item This attribute cannot used standalone. It must appear in conjuction with a second attribute.
+	\end{itemize}
+	
+	\subsection*{Converse}
+	\begin{itemize}
+		\item In VHDL2019 adds mode views to interfaces and this attribute along with them.
+	\end{itemize}
+	
+	\subsection*{Delayed}
+	\begin{itemize}
+		\item When applied to a signal, this attribute produced a signal that's a copy of s, but with the transitions delayed by time units. The derived signal will have a delay of one delta cycle if the optional argument is omitted.
+	\end{itemize}
+	
+	\subsection*{Designed-subtype}
+	\begin{itemize}
+		\item When called on access type or file type, the designated-subtype attribute returns the subtype that the object references.
+	\end{itemize}
+	
+	\subsection*{Driving}
+	\begin{itemize}
+		\item This attribute acts as function returning a boolean value when applied to a signal. You can only use this attribute from within a process or equivalent concurrent statement/subprogram. It will return true if the process is driving the signal and false otherwise.
+		\item When used in a regular signal, this attribute always returns true. That's because a process controlling a signal will always be driving it. However, that's not always the case when it comes guarded signals.
+	\end{itemize}
+	
+	\subsection*{Driving-value}
+	\begin{itemize}
+		\item  When applied to a signal, this attribute works like a function call, returning the value that the enclosing process is driving onto the signal.
+		\item Only used with a process or subprogram.
+	\end{itemize}
+	
+	\subsection*{Element}
+	 \begin{itemize}
+	 	\item This attributes can only be applied to an array type or a signal or variable of an array type. When applied to such an object, it returns the subtype of the array elements.
+	 	\item Can be used for declare new objects.
+	 \end{itemize}
+	
+	\subsection*{Event}
+	\begin{itemize}
+		\item When applied to a signal, this attribute works like a function call, returning true if an event occured on during the current simulation cycle and false if not.
+	\end{itemize}
+	
+	\subsection*{High}
+	\begin{itemize}
+		\item This attribute works like a function returning the upper bound of the object it's attached to. It may be used on any object whose range is contrained.
+	\end{itemize}
+	
+	\subsection*{Left}
+	\begin{itemize}
+		\item This attribute works like a function returning the left bound of the object it's attached to. It may be used on any object whose is constrained
+	\end{itemize}
+	
+	\subsection*{Low}
+	\begin{itemize}
+		\item This attribute works like a function returning the left bound of the object it's attached to. It may be used on any object whose range is constrained.
+	\end{itemize}
+	
+	\subsection*{Quiet}
+	\begin{itemize}
+		\item When applied to a signal this attribute produces a drived signal of boolean type. The resulting signal's value is true if signal was quiet for time before the current simulation time. Otherwise it has the value false.
+	\end{itemize}
+	
+	\subsection*{Right}
+	\begin{itemize}
+		\item This attribute works like a function returning the right bound of the object it’s attached to. It may be used on any object whose range is constrained.
+	\end{itemize}
+	
+	\subsection*{Stable}
+	\begin{itemize}
+		\item When applied to a signal, this attribute produces a derived signal of boolean type, The resulting signal's value is falsse if there were events on signal for time before the current simulation time. If there were no events, it is true
+	\end{itemize}
+	
+	
+	
+	
+	
+	
 \end{document}
