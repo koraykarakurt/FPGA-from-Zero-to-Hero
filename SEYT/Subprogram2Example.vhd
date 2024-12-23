@@ -1,47 +1,47 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
 
-function Add(a, b: INTEGER) return INTEGER is
+function add(a, b: integer) return integer is
 begin
     return a + b;
-end Add;
+end add;
 
-function Add(a, b: REAL) return REAL is
+function add(a, b: real) return real is
 begin
     return a + b;
-end Add;
+end add;
 
-function PositiveAdd is new Add;
+function positiveadd is new add;
 
-entity SubprogramInstantiationExample is
-    Port (
-        a, b       : in  INTEGER;
-        c, d       : in  REAL;
-        result_int : out INTEGER;
-        result_real: out REAL
+entity subprograminstantiationexample is
+    port (
+        a, b       : in  integer;
+        c, d       : in  real;
+        result_int : out integer;
+        result_real: out real
     );
-end SubprogramInstantiationExample;
+end subprograminstantiationexample;
 
-architecture Behavioral of SubprogramInstantiationExample is
-    constant THRESHOLD : INTEGER := 10;
+architecture behavioral of subprograminstantiationexample is
+    constant threshold : integer := 10;
 begin
     process(a, b, c, d)
-        variable tempResultInt : INTEGER;
-        variable tempResultReal : REAL;
+        variable tempresultint : integer;
+        variable tempresultreal : real;
     begin
-        if (a > THRESHOLD and b > THRESHOLD) then
-            tempResultInt := PositiveAdd(a, b);
-            result_int <= tempResultInt;
+        if (a > threshold and b > threshold) then
+            tempresultint := positiveadd(a, b);
+            result_int <= tempresultint;
         else
             result_int <= 0; 
         end if;
 
-        if (c > REAL(THRESHOLD) and d > REAL(THRESHOLD)) then
-            tempResultReal := Add(c, d);
-            result_real <= tempResultReal;
+        if (c > real(threshold) and d > real(threshold)) then
+            tempresultreal := add(c, d);
+            result_real <= tempresultreal;
         else
             result_real <= 0.0;
         end if;
     end process;
-end Behavioral;
+end behavioral;
