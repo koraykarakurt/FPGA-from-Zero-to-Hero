@@ -88,3 +88,94 @@ architecture RTL of Ent is
 end architecture RTL;
 
 --Expressions examples
+
+
+--Concurrent statements examples
+--block statement
+architecture rtl of dsp is
+  ...
+ begin
+  mac_unit: block
+  port (a, b: in float32; mac_out: out float32);
+  port map (a = > x, b = > y, mac_out = > acc);
+  signal multiplier_out: float32;
+  signal adder_out: float32 ;
+
+  begin
+    multiplier_out <= a * b;
+    adder_out <= multiplier_out + mac_out;
+    process (clock, reset) begin
+      if reset then
+        mac_out <= ( others = > '0');
+      elsif rising_edge(clock) then
+        mac_out <= adder_out;
+      end if ;
+    end process ;
+  end block ;
+   
+    ...
+end architecture rtl;
+
+--process example
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity D_FF is
+  port( d,clk: in std_logic;
+  q: out std_logic);
+  end D_FF;
+   
+  architecture bhv of D_FF is
+  begin
+  process(clk)
+  begin
+  if rising_edge(clk) then
+    Q <= D;
+  end if;
+end process;
+end bhv;
+
+-- concurrent procedure call
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+
+entity adder is
+  port (a, b: in integer;
+        sum: out integer);
+  end adder;
+architecture behavior of adder is
+  begin
+    sum <= a + b;
+end;
+
+architecture bhv of adder is
+  procedure add(a, b: in integer;
+          signal sum: out integer) is begin
+    sum <= a + b;
+    end;
+begin
+  adder_component : adder port map (add1, add2, sum1);
+  adder_procedure : add(add1, add2, sum2),
+end architecture bhv;
+--equivalent statements
+architecture sensitiviy_list of adder is
+begin
+  process(add1, add2)
+  begin
+    add(add1, add2, sum2);
+  end process;
+end architecture; --sensitivity list
+
+architecture wait_statement of adder is
+  begin
+    process
+    begin
+      add(add1, add2, sum2);
+      wait on add1, add2;
+    end process;
+end wait_statement; --wait statement     this sensitivity list and wait statement are equivalent each other
+
+
+
