@@ -332,7 +332,7 @@ entity full_adder1 is
         b        : in std_logic;
         carry_in : in std_logic;
         sum      : out std_logic;
-        carry_out: out std_logicr);
+        carry_out: out std_logic);
 end full_adder1;
 
 --full code
