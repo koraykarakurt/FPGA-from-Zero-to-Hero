@@ -353,3 +353,84 @@ architecture structural of adder is
   carry_in_vector <= (carry_in, carry_out_vector( 0 to WIDTH- 2));
   carry_out <= carry_out_vector(WIDTH- 1);
  end structural;
+
+
+--Chapter 16
+--Standard environment package usage in simulator
+procedure stop(status:integer);
+procedure stop;
+procedure finish(status:integer);
+procedure finish;
+
+function resolution_limit return delay_length;
+
+wait for env.resolution_limit;
+
+--standard mathematical packages
+library IEEE;
+Package MATH_REAL is
+    constant MATH_E : real := 2.71828_18284_59045_23536;  
+    constant MATH_1_E: real := 0.36787_94411_71442_32160;
+    constant MATH_PI : real := 3.14159_26535_89793_23846;  
+    constant MATH_1_PI : real := 0.31830_98861_83790_67154;  
+    constant MATH_LOG_OF_2: real := 0.69314_71805_59945_30942;
+    constant MATH_LOG_OF_10: real := 2.30258_50929_94045_68402;
+    constant MATH_LOG2_OF_E: real := 1.44269_50408_88963_4074;
+    constant MATH_LOG10_OF_E: real := 0.43429_44819_03251_82765;
+    constant MATH_SQRT2: real := 1.41421_35623_73095_04880; 
+    constant MATH_SQRT1_2: real := 0.70710_67811_86547_52440; 
+    constant MATH_SQRT_PI: real := 1.77245_38509_05516_02730; 
+    constant MATH_DEG_TO_RAD: real := 0.01745_32925_19943_29577;
+    constant MATH_RAD_TO_DEG: real := 57.29577_95130_82320_87685;
+    attribute FOREIGN : string;
+    function SIGN (X: real ) return real;
+    function CEIL (X : real ) return real;
+    function FLOOR (X : real ) return real;
+    function ROUND (X : real ) return real;
+    function FMAX (X, Y : real ) return real;
+    function FMIN (X, Y : real ) return real;
+    procedure UNIFORM (variable Seed1,Seed2:inout integer; variable X:out real);
+    function SRAND (seed: in integer ) return integer;
+    attribute FOREIGN of SRAND : function is "C_NATIVE"; 
+    function RAND return integer;		
+    attribute FOREIGN of RAND : function is "C_NATIVE"; 
+    function GET_RAND_MAX return integer;		
+    attribute FOREIGN of GET_RAND_MAX : function is "C_NATIVE"; 
+    function SQRT (X : real ) return real;
+    function CBRT (X : real ) return real;
+    function "**" (X : integer; Y : real) return real;
+    function "**" (X : real; Y : real) return real;
+    function EXP  (X : real ) return real;
+    function LOG (X : real ) return real;
+    function LOG (BASE: positive; X : real) return real;
+    function SIN (X : real ) return real;
+    function COS ( X : real ) return real;
+    function TAN (X : real ) return real;
+    function ASIN (X : real ) return real; 
+    function ACOS (X : real ) return real;
+    function ATAN (X : real) return real;
+    function ATAN2 (X : real; Y : real) return real;
+    function SINH (X : real) return real;
+    function COSH (X : real) return real;
+    function TANH (X : real) return real;
+    function ASINH (X : real) return real;
+    function ACOSH (X : real) return real;
+    function ATANH (X : real) return real;
+end MATH_REAL;
+
+
+--standard synthesis context packages
+library IEEE;
+  use IEEE.std_logic_1164.all;
+  use IEEE.numeric_std.all;
+  use sitelib.sitepack.all;
+end context;
+
+context proj1_context is  -- compiled into library proj1lib
+  library sitelib;
+  context sitelib.site_context;
+  use proj1lib.proj1pack.all;
+end context;
+--call
+library proj1lib;
+context proj1lib.proj1_context;
