@@ -1,2 +1,2 @@
 # FPGA-from-Zero-to-Hero
-Repository for FPGA from Zero to Hero - Live and Free FPGA/SoC Lectures on YouTube 
+Repository of FPGA from Zero to Hero - Live and Free FPGA/SoC Lectures on YouTube (www.youtube.com/@falsepaths)
