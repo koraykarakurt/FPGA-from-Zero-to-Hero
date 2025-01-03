@@ -1,3 +1,2 @@
 # FPGA-from-Zero-to-Hero
-FPGA repo for FPGA from Zero to Hero - Live &amp; Free Courses (Turkish Version)
-test 2
+Repository for FPGA from Zero to Hero - Live and Free FPGA/SoC Lectures on YouTube 
