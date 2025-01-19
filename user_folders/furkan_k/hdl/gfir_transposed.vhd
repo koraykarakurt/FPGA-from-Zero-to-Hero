@@ -13,7 +13,7 @@
 -- Dependencies: 
 -- 
 -- Revision:
--- Revision 0.01 - File Created
+-- Revision 0.02 - File Created
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
@@ -70,36 +70,81 @@ architecture Behavioral of gfir_transposed is
   
   -- signals
   signal sum            : signed(input_len + coeff_len - 1 downto 0);
-  signal product_idx    : integer range 0 to filter_taps - 1 := 0;
+  signal product_idx    : integer range 0 to filter_taps - 1;
 
+  signal mult1_d0       : signed(input_len + coeff_len downto 0);
+  signal sig1           : signed(input_len + coeff_len downto 0);
+  signal sig2           : signed(input_len + coeff_len downto 0);
+  signal sig3           : signed(input_len + coeff_len downto 0);
+  signal sig4           : signed(input_len + coeff_len downto 0);
   -- attributes
-  attribute use_dsp : string;
-  attribute use_dsp of Behavioral : architecture is "yes";  
+--  attribute use_dsp : string;
+--  attribute use_dsp of Behavioral : architecture is "yes";  
 
 begin
+
+--  transposed_fir_p : process (reset, clock)
+--  begin
+--    if (reset = '1') then
+--	  product_ar      <= (others => (others => '0'));
+--	  sum             <= (others => '0');
+--	  product_idx     <= 0;
+--	elsif (rising_edge(clock)) then 
+--
+--	  for i in 0 to filter_taps - 1 loop 
+--	    product_ar(i) <= signed(filter_data_i) * filter_coeff(i); -- Q2: when converting from signed to integer, what will be the integer size default 32 bit or optimized according to signed vectors width?		
+--	  end loop;
+--
+--      if (product_idx /= filter_taps) then -- adding the multiplication results
+--	    sum           <= sum + product_ar(product_idx);
+--		product_idx   <= product_idx + 1; -- incrementing product index
+--      else 
+--	    product_idx   <= 0;
+--		sum           <= (others => '0'); -- ???????????????????? not sure this should used or not
+--      end if;
+--	  
+--	end if;
+--  end process transposed_fir_p;
+--
+--  filter_data_o       <= std_logic_vector(sum(output_len-1 downto 0));
 
   transposed_fir_p : process (reset, clock)
   begin
     if (reset = '1') then
 	  product_ar      <= (others => (others => '0'));
-	  sum             <= (others => '0');
-	  product_idx     <= 0;
+--	  sum             <= (others => '0');
+--	  product_idx     <= 0;
+	  
+	  mult1_d0        <= (others => '0');
+	  sig1            <= (others => '0');
+	  sig2            <= (others => '0');
+	  sig3            <= (others => '0');
+	  sig4            <= (others => '0');
+	  filter_data_o   <= (others => '0');
 	elsif (rising_edge(clock)) then 
-
+      filter_data_o   <= std_logic_vector(sig4(output_len-1 downto 0));
+	  mult1_d0        <= '0' & product_ar(0);
+	  sig1            <= mult1_d0 + product_ar(1);
+	  sig2            <= sig1     + product_ar(2);
+	  sig3            <= sig2     + product_ar(3);
+	  sig4            <= sig3     + product_ar(4);
+	  
 	  for i in 0 to filter_taps - 1 loop 
 	    product_ar(i) <= signed(filter_data_i) * filter_coeff(i); -- Q2: when converting from signed to integer, what will be the integer size default 32 bit or optimized according to signed vectors width?		
 	  end loop;
 
-      if (product_idx /= filter_taps) then -- adding the multiplication results
-	    sum           <= sum + product_ar(product_idx);
-		product_idx   <= product_idx + 1; -- incrementing product index
-      else 
-	    product_idx   <= 0;
-		sum           <= (others => '0'); -- ???????????????????? not sure this should used or not
-      end if;
+--      if (product_idx /= filter_taps) then -- adding the multiplication results
+--	    sum           <= sum + product_ar(product_idx);
+--		product_idx   <= product_idx + 1; -- incrementing product index
+--      else 
+--	    product_idx   <= 0;
+--		sum           <= (others => '0'); -- ???????????????????? not sure this should used or not
+--      end if;
 	  
 	end if;
   end process transposed_fir_p;
+
+
 
 
 end Behavioral;
