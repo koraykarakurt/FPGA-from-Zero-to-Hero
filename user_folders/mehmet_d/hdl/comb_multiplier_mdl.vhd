@@ -1,16 +1,16 @@
 --------------------------------------------------------------------------------------------------
--- Company: False Paths --> https://www.youtube.com/@falsepaths
--- Project: Generic FIR Filter Design and Verification
--- Engineer: Mehmet Demir
+-- Company  : False Paths --> https://www.youtube.com/@falsepaths
+-- Project  : Generic FIR Filter Design and Verification
+-- Engineer : Mehmet Demir
 -- 
--- Design Name: Combinational Multiplier
--- VHDL Revision: VHDL-2002
--- Target Devices: NA
--- Tool Versions: NA
--- Dependencies: NA
--- Description: Combinational multiplier module with signed/unsigned and bit length generics.
+-- Design Name    : Combinational Multiplier
+-- VHDL Revision  : VHDL-2002
+-- Target Devices : NA
+-- Tool Versions  : NA
+-- Dependencies   : NA
+-- Description    : Combinational multiplier module with signed/unsigned and bit length generics.
 -- 
--- Revision --> 01v00; Date --> 21.01.25; JIRA No --> FIRF-9; Reason --> First Release
+-- Revision --> 01v00; Date --> 23.01.25; JIRA No --> FIRF-9; Reason --> First Release
 -- 
 --------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ use IEEE.numeric_std.all; -- for arithmetic operations
 entity comb_multiplier_mdl is
   generic (
     select_sign_g : std_logic              := '0'; -- '0': unsigned, '1': signed
-    bit_length_g  : integer range 0 to 255 := 8 -- define bit length for both inputs as same, the output length will be sum of the input lengths
+    bit_length_g  : natural range 2 to 255 := 8 -- define bit length for both inputs as same, the output length will be sum of the input lengths. Min value must be 2.
   );
   port (
     mult_1_i    : in std_logic_vector(bit_length_g - 1 downto 0);
