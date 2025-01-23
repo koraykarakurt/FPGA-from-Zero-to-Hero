@@ -1,3 +1,19 @@
+-- Company:  FPGA_FROM_ZERO_TO_HERO
+-- Engineer: Mert Ecevit
+-- 
+-- Create Date: 19.01.2025 22:14:16
+-- Design Name: 
+-- Module Name: fully_transposed_systolic_fir_filter - Behavioral
+-- Project Name: FILTER
+-- Target Devices: Design will be optimized for Sipeed Tang Primer 20k Dock-Ext board
+-- Tool Versions: Gowin EDA
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.03 - Edited generics, coeff_pipe
+
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
@@ -5,9 +21,9 @@ use IEEE.numeric_std.all;
 entity fully_parallel_systolic_fir_filter is
    generic (
       taps         : integer := 4;
-      input_width  : integer range 8 to 25 := 16;
-      coeff_width  : integer range 8 to 18 := 16;
-      output_width : integer range 8 to 43 := 32  
+      input_width  : natural := 16;
+      coeff_width  : natural := 16;
+      output_width : natural := 32; 
     );
    port (
       clk    : in  std_logic;
