@@ -23,7 +23,7 @@ entity fully_parallel_systolic_fir_filter is
       taps         : integer := 4;
       input_width  : natural := 16;
       coeff_width  : natural := 16;
-      output_width : natural := 32; 
+      output_width : natural := 32;
     );
    port (
       clk    : in  std_logic;
@@ -44,12 +44,6 @@ architecture behavioral of fully_parallel_systolic_fir_filter is
    signal data_pipe : pipeline_data := (others => (others => '0'));
 
    type pipeline_coeffs is array (0 to taps-1) of signed(coeff_width-1 downto 0);
-   -- constant coeff_pipe : pipeline_coeffs := (
-      -- x"0001", x"0002", x"0003", x"0004", x"0005", x"0006", x"0007", x"0008",
-      -- x"0009", x"000A", x"000B", x"000C", x"000D", x"000E", x"000F", x"0010",
-      -- x"0011", x"0012", x"0013", x"0014", x"0015", x"0016", x"0017", x"0018",
-      -- x"0019", x"001A", x"001B", x"001C", x"001D", x"001E"
-   -- );
       constant coeff_pipe : pipeline_coeffs := (
       x"0001", x"0002", x"0003", x"0004"
    );
