@@ -15,8 +15,8 @@
 -- 
 -- Author: Mustafa YETIS
 -- Last Revision: 
---   Date: 23.01.2025 / 18:30
---   Revision: initial
+--   Date: 27.01.2025 / 18:30
+--   Revision: 	"corrected signal initializations "
 -- 
 -- Dependencies:
 --   - IEEE.STD_LOGIC_1164 library for logical and signal operations.
@@ -49,8 +49,9 @@ entity parity_generator is
 end parity_generator;
 
 architecture behavioral of parity_generator is
-    signal even_parity : std_logic; -- generated even parity
-    signal odd_parity  : std_logic; -- generated odd parity
+    signal even_parity : std_logic := '0'; -- generated even parity
+    signal odd_parity  : std_logic := '0'; -- generated odd parity
+    signal gen_parity  : std_logic := '0'; -- generated parity
 begin
     process(data_in, parity_mode_select)
     begin
@@ -62,10 +63,15 @@ begin
         odd_parity <= not(even_parity);
         
         -- mux for output with respect to parity_mode_select
-        generated_parity <= even_parity when (parity_mode_select = '0') else odd_parity;
+        --generated_parity <= even_parity when (parity_mode_select = '0') else odd_parity;
+        if parity_mode_select = '0' then
+            gen_parity <= even_parity;
+        else 
+            gen_parity <= odd_parity;
+        end if;
     end process;
 
     -- parity error is calculated as xor between rx_parity_bit and generated_parity
-    parity_error <= rx_parity_bit xor generated_parity;
-
+    parity_error <= rx_parity_bit xor gen_parity;
+    generated_parity <= gen_parity;
 end behavioral;

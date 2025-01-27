@@ -8,8 +8,8 @@
 -- parity. The testbench covers various test cases, including normal operation,
 -- parity error scenarios, and edge cases.
 --
--- Author: [Your Name]
--- Last Revision: 2025-01-23 (Revision 1.0)
+-- Author: Mustafa Yetis
+-- Last Revision: 2027-01-23 (Revision 1.0.1)	"corrected signal initializations "
 --
 -- Dependency:
 -- - parity_generator.vhd: The design under test (DUT).
@@ -35,28 +35,6 @@
 -- - The testbench is self-checking using assertions.
 -- - Simulation halts and displays an error message if any test case fails.
 -------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------
--- Testbench for Parity Generator with Parity Checking
---
--- Description:
--- This testbench verifies the functionality of the parity_generator module,
--- which generates parity bits (even or odd) based on input data and detects
--- parity errors by comparing the received parity bit against the generated
--- parity. The testbench includes various scenarios, including valid cases,
--- intentional parity errors, and edge cases.
---
--- Author: [Your Name]
--- Last Revision: 2025-01-23 (Revision 1.1)
---
--- Dependency:
--- - parity_generator.vhd: The design under test (DUT).
---
--- Notes:
--- - The testbench uses assertions to validate the functionality of the DUT.
--- - Simulation halts and displays an error message if any assertion fails.
--------------------------------------------------------------------------------
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 
@@ -76,11 +54,11 @@ architecture behavioral of tb_parity_generator is
     end component;
 
     -- testbench signals
-    signal tb_data_in         : std_logic_vector(7 downto 0);
-    signal tb_parity_mode_sel : std_logic;
-    signal tb_generated_parity: std_logic;
-    signal tb_rx_parity_bit   : std_logic;
-    signal tb_parity_error    : std_logic;
+    signal tb_data_in         : std_logic_vector(7 downto 0) := "10101010";
+    signal tb_parity_mode_sel : std_logic := '0';
+    signal tb_generated_parity: std_logic := '0';
+    signal tb_rx_parity_bit   : std_logic := '0';
+    signal tb_parity_error    : std_logic := '0';
 begin
     -- instantiate dut
     dut: parity_generator
