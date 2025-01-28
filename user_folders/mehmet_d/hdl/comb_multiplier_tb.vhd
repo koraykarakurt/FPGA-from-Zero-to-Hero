@@ -3,14 +3,14 @@
 -- Project  : Generic FIR Filter Design and Verification
 -- Engineer : Mehmet Demir
 --
--- Testbench Name : Combinational Multiplier Tesbench
+-- Testbench Name : Combinational Multiplier Testbench
 -- VHDL Revision  : VHDL-2019
 -- Target Devices : Aldec Riviera Pro 2023.04 / EDA playground
 -- Tool Versions  : NA
 -- Dependencies   : NA
 -- Description    : Test the combinational multiplier module with selfchecking testbenches using assertions.
 -- 
--- Revision --> 01v00; Date --> 28.01.25; JIRA No --> FIRF-9; Reason --> First Release
+-- Revision --> 01v00; Date --> 29.01.25; JIRA No --> FIRF-9; Reason --> First Release
 -- 
 --------------------------------------------------------------------------------------------------
 
@@ -24,6 +24,9 @@ library osvvm;
 use osvvm.randompkg.all; -- for random operations on simulation
 use osvvm.randombasepkg.all; -- for salt operations on simulation 
 
+library work;
+use work.comb_multiplier_sim_pkg.all; -- testbench/simulation package, all constants, funcitons, procedures etc. are in the comb_multiplier_sim_pkg, soo see it.
+
 entity comb_multiplier_tb is
    --port (); -- no need ports for simulation
 end comb_multiplier_tb;
@@ -31,138 +34,22 @@ end comb_multiplier_tb;
 architecture behavioral_sim of comb_multiplier_tb is
 
    ----------------------------------------------------
-   -- comb_multiplier_tb
+   -- comb_multiplier (dut/duv) signals, initialize inputs not outputs
    ----------------------------------------------------
-   constant delta_cycle : time := 0 ns;
-   constant wait_time   : time := 10 ns;
-
-   constant unsigned_name : std_logic := '0'; -- name suffix added to avoid raw unsigned name, gives error
-   constant signed_name   : std_logic := '1'; -- name suffix added to avoid raw signed name, gives error
-
-   constant error_inject_prcntg : natural range 0 to 100 := 5; -- error injection percentage
-
-   file file_obj : text; -- must be in here for procedures, if it is in below of process than a procedure can not be see this object
-
-   ----------------------------------------------------
-   -- comb_multiplier (dut/duv), initialize inputs not outputs
-   ----------------------------------------------------
-   constant bitlength : natural range 2 to 255 := 8;
-
-   signal mult_1                 : std_logic_vector(bitlength - 1 downto 0)               := (others => '0');
-   signal mult_2                 : std_logic_vector(bitlength - 1 downto 0)               := (others => '0');
-   signal multrslt_1             : std_logic_vector((bitlength + bitlength) - 1 downto 0) := (others => '0');
-   signal multrslt_2             : std_logic_vector((bitlength + bitlength) - 1 downto 0) := (others => '0');
+   signal mult_1_uns             : std_logic_vector(bitlength - 1 downto 0)               := (others => '0');
+   signal mult_2_uns             : std_logic_vector(bitlength - 1 downto 0)               := (others => '0');
+   signal mult_1_s               : std_logic_vector(bitlength - 1 downto 0)               := (others => '0');
+   signal mult_2_s               : std_logic_vector(bitlength - 1 downto 0)               := (others => '0');
+   signal multrslt_uns           : std_logic_vector((bitlength + bitlength) - 1 downto 0) := (others => '0'); -- _uns suffix --> unsigned
+   signal multrslt_s             : std_logic_vector((bitlength + bitlength) - 1 downto 0) := (others => '0'); -- _s suffix --> signed
    signal expected_unsigned_rslt : std_logic_vector((bitlength + bitlength) - 1 downto 0) := (others => '0');
    signal expected_signed_rslt   : std_logic_vector((bitlength + bitlength) - 1 downto 0) := (others => '0');
 
    ----------------------------------------------------
-   -- functions
+   -- comb_multiplier_tb signals
    ----------------------------------------------------
-   function compare_results(
-      expected_result : std_logic_vector((bitlength + bitlength) - 1 downto 0); -- or golden_value
-      dut_result      : std_logic_vector((bitlength + bitlength) - 1 downto 0);
-      inject_error    : boolean := false -- true --> inject error, 'false' --> do not inject error
-   ) return boolean is
-   begin
-      if inject_error then
-         --return expected_result /= dut_result;
-         return not (expected_result = dut_result);
-      else
-         return expected_result = dut_result;
-      end if;
-   end function;
-
-   ----------------------------------------------------
-   -- procedures
-   ----------------------------------------------------
-   procedure sim_done is
-   begin
-      -- testing complete, stop with assertion
-      assert false report lf &
-      "--------------------------------------------------------------------------------------------------------------------------" & lf & 
-      "--------------------------------------------------------------------------------------------------------------------------" & lf & 
-      "-- simulation has been done properly at " & string'image(to_string(gmtime)) & " gmt +0 real time and at " & time'image(now) & " sim time, well done :) --" & lf &
-      "--------------------------------------------------------------------------------------------------------------------------" & lf & 
-      "--------------------------------------------------------------------------------------------------------------------------" severity failure;
-   end procedure;
-
-   procedure check_with_assertion(
-      signal expected_result : in std_logic_vector((bitlength + bitlength) - 1 downto 0); -- or golden_value
-      signal dut_result      : in std_logic_vector((bitlength + bitlength) - 1 downto 0);
-      unsigned_or_signed     : in std_logic; -- '0' --> unsigned, '1' --> signed;
-      inject_error           : in boolean -- true --> inject error, 'false' --> do not inject error
-   ) is
-   begin
-
-      if inject_error then
-         report "error injected, no worry";
-      end if;
-
-      if unsigned_or_signed = '1' then -- signed
-         assert compare_results(expected_result, dut_result, inject_error) report "signed expected/golden value not equal to dut result" & lf &
-         " mult_1 --> " & integer'image(to_integer(signed(mult_1))) & " mult_2 --> " & integer'image(to_integer(signed(mult_2))) & 
-         " dut result --> " & integer'image(to_integer(signed(expected_signed_rslt))) severity error;
-      else -- unsigned
-         assert compare_results(expected_result, dut_result, inject_error) report "unsigned expected/golden value not equal to dut result" & lf &
-         " mult_1 --> " & integer'image(to_integer(unsigned(mult_1))) & " mult_2 --> " & integer'image(to_integer(unsigned(mult_2))) & 
-         " dut result --> " & integer'image(to_integer(unsigned(expected_unsigned_rslt))) severity error;
-      end if;
-
-   end procedure;
-
-   procedure write_error2file (
-      --file file_obj          : out text;   
-      variable line_obj      : out line;
-      signal expected_result : in std_logic_vector((bitlength + bitlength) - 1 downto 0); -- or golden_value
-      signal dut_result      : in std_logic_vector((bitlength + bitlength) - 1 downto 0);
-      unsigned_or_signed     : in std_logic; -- '0' --> unsigned, '1' --> signed;
-      inject_error           : in boolean
-   ) is
-   begin
-
-      if inject_error then
-         write(line_obj, string'("error injected, no worry"));
-         writeline(file_obj, line_obj);
-      end if;
-
-      if unsigned_or_signed = '1' then -- signed
-         if not compare_results(expected_result, dut_result, inject_error) then
-            write(line_obj, string'("signed expected/golden value not equal to dut result"));
-            writeline(file_obj, line_obj); --> line break --> \n
-            write(line_obj, string'(" mult_1 --> ")); write(line_obj, to_integer(signed(mult_1)));
-            write(line_obj, string'(" mult_2 --> ")); write(line_obj, to_integer(signed(mult_2)));
-            write(line_obj, string'(" dut result --> ")); write(line_obj, to_integer(signed(expected_signed_rslt)));
-            writeline(file_obj, line_obj); --> line break --> \n
-         end if;
-      else -- unsigned
-         if not compare_results(expected_result, dut_result, inject_error) then
-            write(line_obj, string'("unsigned expected/golden value not equal to dut result"));
-            writeline(file_obj, line_obj); --> line break --> \n
-            write(line_obj, string'(" mult_1 --> ")); write(line_obj, to_integer(unsigned(mult_1)));
-            write(line_obj, string'(" mult_2 --> ")); write(line_obj, to_integer(unsigned(mult_2)));
-            write(line_obj, string'(" dut result --> ")); write(line_obj, to_integer(unsigned(expected_signed_rslt)));
-            writeline(file_obj, line_obj); --> line break --> \n
-         end if;
-      end if;
-
-   end procedure;
-
-   procedure write_file_header (
-      --file file_obj          : out text;   
-      variable line_obj   : out line;
-      variable loop_limit : in integer
-   ) is
-   begin
-      file_open(file_obj, "output_file.txt", write_mode);
-      write(line_obj, string'(" -- only simulation errors -- "));
-      writeline(file_obj, line_obj);
-      write(line_obj, string'(" loop limit --> ")); write(line_obj, loop_limit);
-      writeline(file_obj, line_obj);
-      write(line_obj, string'(" error injection percentage --> ")); write(line_obj, error_inject_prcntg);
-      writeline(file_obj, line_obj);
-      writeline(file_obj, line_obj); --> line break --> \n
-
-   end procedure;
+   signal unsigned_sim_finished : std_logic := '0';
+   signal signed_sim_finished   : std_logic := '0';
 
 begin
 
@@ -176,9 +63,9 @@ begin
       )
       port map
       (
-         mult_1    => mult_1,
-         mult_2    => mult_2,
-         mult_rslt => multrslt_1
+         mult_1    => mult_1_uns,
+         mult_2    => mult_2_uns,
+         mult_rslt => multrslt_uns
       );
 
    ----------------------------------------------------
@@ -191,15 +78,15 @@ begin
       )
       port map
       (
-         mult_1    => mult_1,
-         mult_2    => mult_2,
-         mult_rslt => multrslt_2
+         mult_1    => mult_1_s,
+         mult_2    => mult_2_s,
+         mult_rslt => multrslt_s
       );
 
    ----------------------------------------------------  
    -- generates the test stimulus for dut_inst_unsigned
    ----------------------------------------------------
-   stimulus : process
+   stimulus_unsigned : process
       variable rv              : randomptype;
       variable loop_limit      : integer;
       variable error_injection : boolean;
@@ -221,7 +108,7 @@ begin
       report "loop limit --> " & integer'image(loop_limit) & lf & " error injection percentage --> " & integer'image(error_inject_prcntg);
 
          -- open file with write mode and write header to file
-         write_file_header(line_obj, loop_limit);
+         write_file_header(DUT_unsigned_file_name, line_obj, loop_limit);
 
       for i in 1 to loop_limit loop
 
@@ -234,36 +121,92 @@ begin
             when others => -- if not defined, gives error --> COMP96 ERROR COMP96_0301: "The choice 'others' must be present when all alternatives are not covered.
                null;
          end case;
-         mult_1 <= rv.randslv(min => 0, max => (2 ** bitlength) - 1, size => bitlength);
-         mult_2 <= rv.randslv(min => 0, max => (2 ** bitlength) - 1, size => bitlength);
+         mult_1_uns <= rv.randslv(min => 0, max => (2 ** bitlength) - 1, size => bitlength);
+         mult_2_uns <= rv.randslv(min => 0, max => (2 ** bitlength) - 1, size => bitlength);
          wait for delta_cycle;
 
          -- calculate expected values
-         expected_unsigned_rslt <= std_logic_vector(unsigned(mult_1) * unsigned(mult_2));
-         expected_signed_rslt   <= std_logic_vector(signed(mult_1) * signed(mult_2));
+         expected_unsigned_rslt <= std_logic_vector(unsigned(mult_1_uns) * unsigned(mult_2_uns));
          wait for wait_time;
 
          -- check and log the errors to file
-         write_error2file(line_obj, expected_unsigned_rslt, multrslt_1, unsigned_name, error_injection);
-         write_error2file(line_obj, expected_signed_rslt, multrslt_2, signed_name, error_injection);
+         write_error2file(DUT_unsigned_file_name, mult_1_uns, mult_2_uns, line_obj, expected_unsigned_rslt, multrslt_uns, unsigned_name, error_injection);
 
          -- check with assertions
-         check_with_assertion(expected_unsigned_rslt, multrslt_1, unsigned_name, error_injection);
-         check_with_assertion(expected_signed_rslt, multrslt_2, signed_name, error_injection);
+         check_with_assertion(mult_1_uns, mult_2_uns, expected_unsigned_rslt, multrslt_uns, unsigned_name, error_injection);
 
       end loop;
 
-      -- close file
-      file_close(file_obj);
+      unsigned_sim_finished <= '1';
+      wait;
 
-      -- testing complete, stop with assertion
-      sim_done;
-
-   end process stimulus;
+   end process stimulus_unsigned;
 
    ----------------------------------------------------  
    -- generates the test stimulus for dut_inst_signed
    ----------------------------------------------------
+   stimulus_signed : process
+      variable rv              : randomptype;
+      variable loop_limit      : integer;
+      variable error_injection : boolean;
+      variable line_obj        : line;
+   begin
 
+      -- need for randomization
+      setrandomsalt (to_string(gmtime) & rv'instance_name);
+      rv.initseed(to_string(gmtime) & rv'instance_name);
+
+      -- wait for the start
+      wait for wait_time;
+
+      -- generate test cases --
+
+      -- generate random values
+      loop_limit := rv.randint(50, 200);
+
+      report "loop limit --> " & integer'image(loop_limit) & lf & " error injection percentage --> " & integer'image(error_inject_prcntg);
+
+         -- open file with write mode and write header to file
+         write_file_header(DUT_signed_file_name, line_obj, loop_limit);
+
+      for i in 1 to loop_limit loop
+
+         -- generate random vales
+         case rv.distvalint(((0, 100 - error_inject_prcntg), (1, error_inject_prcntg))) is -- generate random values (only 0 or 1) with the rates
+            when 0 => -- 95%
+               error_injection := false;
+            when 1 => -- 5%
+               error_injection := true;
+            when others => -- if not defined, gives error --> COMP96 ERROR COMP96_0301: "The choice 'others' must be present when all alternatives are not covered.
+               null;
+         end case;
+         mult_1_s <= rv.randslv(min => 0, max => (2 ** bitlength) - 1, size => bitlength);
+         mult_2_s <= rv.randslv(min => 0, max => (2 ** bitlength) - 1, size => bitlength);
+         wait for delta_cycle;
+
+         -- calculate expected values
+         expected_signed_rslt <= std_logic_vector(signed(mult_1_s) * signed(mult_2_s));
+         wait for wait_time;
+
+         -- check and log the errors to file
+         write_error2file(DUT_signed_file_name, mult_1_s, mult_2_s, line_obj, expected_signed_rslt, multrslt_s, signed_name, error_injection);
+
+         -- check with assertions
+         check_with_assertion(mult_1_s, mult_2_s, expected_signed_rslt, multrslt_s, signed_name, error_injection);
+
+      end loop;
+
+      signed_sim_finished <= '1';
+      wait;
+
+   end process stimulus_signed;
+
+   finish_sim : process
+   begin
+
+      wait until (unsigned_sim_finished = '1' and signed_sim_finished = '1');
+      sim_done;
+
+   end process finish_sim;
 end behavioral_sim;
 -- /* The End */ --
