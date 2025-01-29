@@ -12,18 +12,20 @@
 -- Dependencies: 
 -- 
 -- Revision:
--- Revision 0.03 - Edited generics, coeff_pipe
+-- Revision 0.04 - Edit errors and add libraries for using DSP units
 
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+library gw2a;
+use gw2a.components.all;
 
 entity fully_parallel_systolic_fir_filter is
    generic (
       taps         : integer := 4;
       input_width  : natural := 16;
       coeff_width  : natural := 16;
-      output_width : natural := 32;
+      output_width : natural := 32
     );
    port (
       clk    : in  std_logic;
