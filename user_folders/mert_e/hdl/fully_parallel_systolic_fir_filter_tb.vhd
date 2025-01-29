@@ -12,7 +12,7 @@
 -- Dependencies: 
 -- 
 -- Revision:
--- Revision 0.01 -File Created
+-- Revision 0.02 -Edited errors
 
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -43,7 +43,10 @@ constant filter_delay : natural := 1;
 
 begin
   dut : entity work.fully_parallel_systolic_fir_filter
-  generic map(coeffs => coeffs, input_width => input_width=> input_width, output_width => output_width)
+  generic map(coeffs => coeffs,
+              input_width => input_width, 
+              output_width => output_width
+)
 
   stim : process
   begin
@@ -60,7 +63,7 @@ begin
 
     wait for 1us;
     finished <= true;
-  end process;
+  end process stim;
 
 
   check : process
@@ -88,7 +91,7 @@ begin
       data_check <= (others => '0');
 
       wait for 1us;
-  end process;
+  end process check;
 
   clk <= not clk after 10ns when not finished;
 end bhv;
