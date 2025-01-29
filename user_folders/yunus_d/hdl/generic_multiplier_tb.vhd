@@ -48,6 +48,10 @@ architecture Behavioral of generic_multiplier_tb is
 begin
 
     P_STIMULI : process
+    -- 29/01/2025, review note by koray_k 
+    -- use two independent stimuli (one for signed one for unsigned component 
+    -- and run tests in parallel not sequentially as below, also labels shall be lowercase as well
+    -- P_STIMULI >>> p_stimuli also RandomPType >>> randomptype
         variable rand_gen : RandomPType; -- Declare random generator as variable
         variable random_value_uns : integer;
         variable random_value_s : integer;
