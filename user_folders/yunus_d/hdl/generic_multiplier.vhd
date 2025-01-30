@@ -20,13 +20,14 @@ begin
 
 -- 29/01/2025, review note by koray_k 
 -- use if generate statement to implement this instead of process statement	
-p_main: process(mult1,mult2) begin
-	if( mult_type = 0) then
+
+	uns_gen : if(mult_type = 0) generate
 		mult_o <= std_logic_vector(unsigned(mult1) * unsigned(mult2));
-	else
+	end generate;
+	
+	s_gen : if(mult_type /= 0) generate
 		mult_o <= std_logic_vector((signed(mult1) * signed(mult2)));
-	end if;
-end process p_main;
+	end generate;
 
  
 
