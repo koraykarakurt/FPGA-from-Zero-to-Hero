@@ -39,6 +39,7 @@ architecture behavioral of partly_systolic_fir_filter is
 	signal data_arr 					: data_array := (others => (others=>'0'));
 	signal data_count 				: integer range 0 to filter_taps := 0;
 	signal filtered_data_arr_full	: std_logic :='0'; 
+	signal mult_res_full : std_logic := '0';
 	signal par_stage					: integer range 0 to par_ser_factor := 0;
 	signal data_o_count				: integer range 0 to data_o_size := 0;
 	
@@ -53,6 +54,10 @@ architecture behavioral of partly_systolic_fir_filter is
 	type filtered_data_array is array (filter_taps-1 downto 0) of signed(data_width+coeff_width-1 downto 0);
 	signal filtered_data_arr : filtered_data_array := (others => (others=>'0')); 
 
+	type mult_result is array (filter_taps-1 downto 0) of signed(data_width+coeff_width-1 downto 0);
+	signal mult_res : mult_result := (others => (others=>'0'));
+
+	
 begin
 
 	process(clk) begin
@@ -74,11 +79,11 @@ begin
 				
 				if(data_count = filter_taps / par_ser_factor and filtered_data_arr_full = '0') then
 				
-					filtered_data_arr(0) <= data_arr(0)*coeff(0);
+					mult_res(0) <= data_arr(0)*coeff(0);
 			
 					for i in 1 to filter_taps / par_ser_factor - 1 loop
 						
-						filtered_data_arr(i) <= (signed(data_arr(i))*coeff(i)); 
+						mult_res(i) <= (signed(data_arr(i))*coeff(i)); 
 						
 					end loop;
 					
@@ -88,17 +93,32 @@ begin
 				
 					for j in filter_taps / par_ser_factor to filter_taps-1 loop
 					
-						filtered_data_arr(j) <= (data_arr(j)*coeff(j));
+						mult_res(j) <= (data_arr(j)*coeff(j));
 					
 					end loop;
 					
-					filtered_data_arr_full <= '1'; 
+					mult_res_full <= '1'; 
 					data_count <= 0;
 					
 				end if;
 				
-				if(filtered_data_arr_full = '1') then
+				if(mult_res_full = '1') then
+						
+					filtered_data_arr(0) <= mult_res(0);
+					
+					for k in 1 to filter_taps-1 loop
+					
+						filtered_data_arr(k) <= mult_res(k) + mult_res(k-1);
+					
+					end loop;
+					
+					filtered_data_arr_full <= '1';
+					mult_res_full	<= '0';
 				
+				end if;
+				
+				if(filtered_data_arr_full = '1') then
+					
 					filtered_data_o 		<= std_logic_vector(filtered_data_arr(data_o_count));
 					data_o_vld 				<= '1';
 					data_o_count			<= data_o_count + 1;
