@@ -48,6 +48,7 @@ begin
               output_width => output_width
 )
 
+
   stim : process
   begin
     rst <= '1';
@@ -65,7 +66,9 @@ begin
     finished <= true;
   end process stim;
 
-
+   -- 31/01/2025, review note by koray_k 
+   -- provide some simple (maybe constant) inputs and check the functionality of the filter first
+   -- also fix the tab size >> each tab = 3 spaces
   check : process
   variable current_output : real;
   begin

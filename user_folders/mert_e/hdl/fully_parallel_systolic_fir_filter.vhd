@@ -33,6 +33,8 @@ entity fully_parallel_systolic_fir_filter is
       enable : in  std_logic;
       data_i : in  std_logic_vector(input_width-1 downto 0);
       data_o : out std_logic_vector(output_width-1 downto 0)
+      -- 31/01/2025, review note by koray_k 
+      -- remove suffixes _i _o, and add valid output
    );
 end fully_parallel_systolic_fir_filter;
 
@@ -40,6 +42,9 @@ architecture behavioral of fully_parallel_systolic_fir_filter is
 
    -- Constant for the multiplication width
    constant mac_width : integer := input_width + coeff_width;
+   -- 31/01/2025, review note by koray_k 
+   -- add guard bits for macc otherwise it may overflow/underflow fast
+
 
    -- Type definitions for systolic pipeline stages
    type pipeline_data is array (0 to taps-1) of signed(input_width-1 downto 0);
@@ -78,6 +83,8 @@ begin
                     else
                         sum_pipe(i) <= sum_pipe(i-1) + resize(product_pipe(i), output_width);
                     end if;
+               -- 31/01/2025, review note by koray_k 
+               -- check functionality of this code
                 end loop;
             end if;
         end if;
