@@ -22,15 +22,15 @@ use gw2a.components.all;
 
 entity fully_parallel_systolic_fir_filter is
    generic (
-      taps                  : integer := 4;
-      input_width           : natural := 16;
-      coeff_width           : natural := 16;
-      output_width          : natural := 32
+      taps                  : integer := 4; -- rename this generic as number_of_taps
+      input_width           : natural := 18;
+      coeff_width           : natural := 18;
+      output_width          : natural := 54 -- guard_bits = 54 - 18 - 18 = 18
     );
    port (
       clk                   : in  std_logic;
       rst                   : in  std_logic;
-      enable                : in  std_logic;
+      enable                : in  std_logic;-- rename this port as valid_in
       data_in               : in  std_logic_vector(input_width-1 downto 0);
       data_out              : out std_logic_vector(output_width-1 downto 0);
       valid_out             : out std_logic
