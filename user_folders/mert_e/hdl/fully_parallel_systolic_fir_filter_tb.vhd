@@ -3,7 +3,7 @@
 -- 
 -- Create Date: 24.01.2025 11:37:01
 -- Design Name: 
--- Module Name: fully_transposed_systolic_fir_filter - Behavioral
+-- Module Name: fully_transposed_systolic_fir_filter_tb - bhv
 -- Project Name: FILTER
 -- Target Devices: Design will be optimized for Sipeed Tang Primer 20k Dock-Ext board
 -- Tool Versions: Gowin EDA
@@ -30,8 +30,8 @@ architecture bhv of fully_parallel_systolic_fir_filter_tb is
   signal clk      : std_logic := '0';
   signal finished : boolean := false;
 
-signal data_i : std_logic_vector(15 downto 0) := (others => '0');
-signal data_o , data_check : std_logic_vector(15 downto 0) := (others => '0');
+signal data_in : std_logic_vector(15 downto 0) := (others => '0');
+signal data_out , data_check : std_logic_vector(15 downto 0) := (others => '0');
 
 constant input_width : natural := 16;
 constant input_width_scale : real := real (2 ** input_width-1) - 1.0;
@@ -57,10 +57,10 @@ begin
     rst <= '0';
     wait until rising_edge(clk);
     sample_driver : for i in 0 to 3 loop
-      data_i <= std_logic_vector(to_signed(integer(input_width_scale*coeffs(i)), 16));
+      data_in <= std_logic_vector(to_signed(integer(input_width_scale*coeffs(i)), 16));
       wait until rising_edge(clk);
     end loop;
-    data_i <= (others => '0');
+    data_in <= (others => '0');
 
     wait for 1us;
     finished <= true;
@@ -88,7 +88,7 @@ begin
         end loop;
         data_check <= std_logic_vector(to_signed(integer(trunc(output_width_scale * current_output)), 16));
 
-        assert abs(signed(data_check) - signed(data_o)) <= 2 report "FIR FILTER OUTPUT IS INCORRECT" severity error;
+        assert abs(signed(data_check) - signed(data_out)) <= 2 report "FIR FILTER OUTPUT IS INCORRECT" severity error;
         wait until rising_edge(clk);
       end loop;
       data_check <= (others => '0');
