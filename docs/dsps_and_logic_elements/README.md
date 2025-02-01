@@ -1,4 +1,4 @@
-# DSP, CLB/ALM/LE documents of our development boards:
+# DSP, CLB/LAB/Slice/ALM/LE documents of our development boards:
 # Ultra96-V2  (Xilinx)
 # Kria KV260  (Xilinx)
 # Basys3      (Xilinx)
