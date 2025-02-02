@@ -47,7 +47,14 @@ begin
               input_width => input_width, 
               output_width => output_width
 )
-
+  port map (
+      clk       => clk,
+      rst       => rst,
+      valid_in  => valid_in,
+      data_in   => data_in,
+      data_out  => data_out,
+      valid_out => valid_out
+);
 
   stim : process
   begin

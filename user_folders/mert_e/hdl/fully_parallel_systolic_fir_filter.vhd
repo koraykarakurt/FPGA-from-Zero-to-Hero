@@ -22,7 +22,7 @@ use gw2a.components.all;
 
 entity fully_parallel_systolic_fir_filter is
    generic (
-      taps                  : integer := 4; -- rename this generic as number_of_taps
+      number_of_taps        : integer := 4; 
       input_width           : natural := 18;
       coeff_width           : natural := 18;
       output_width          : natural := 54 -- guard_bits = 54 - 18 - 18 = 18
@@ -30,7 +30,7 @@ entity fully_parallel_systolic_fir_filter is
    port (
       clk                   : in  std_logic;
       rst                   : in  std_logic;
-      enable                : in  std_logic;-- rename this port as valid_in
+      valid_in              : in  std_logic;
       data_in               : in  std_logic_vector(input_width-1 downto 0);
       data_out              : out std_logic_vector(output_width-1 downto 0);
       valid_out             : out std_logic
@@ -42,8 +42,7 @@ end fully_parallel_systolic_fir_filter;
 architecture behavioral of fully_parallel_systolic_fir_filter is
 
    -- Constant for the multiplication width
-   constant guard_bits      : integer := 2;
-   constant mac_width       : integer := input_width + coeff_width + guard_bits;
+   constant mac_width       : integer := output_width;
    -- 31/01/2025, review note by koray_k 
    -- add guard bits for macc otherwise it may overflow/underflow fast
 
@@ -55,7 +54,7 @@ architecture behavioral of fully_parallel_systolic_fir_filter is
 
    type pipeline_coeffs is array (0 to taps-1) of signed(coeff_width-1 downto 0);
       constant coeff_pipe   : pipeline_coeffs := (
-      x"0001", x"0002", x"0003", x"0004"
+      x"0001", x"0002", x"0003", x"0004", x"0005"
    );
 
    type pipeline_products is array (0 to taps-1) of signed(mac_width-1 downto 0);
@@ -74,7 +73,7 @@ begin
                 product_pipe <= (others => (others => '0'));
                 sum_pipe <= (others => (others => '0'));
                 valid_pipe  <= (others => '0');
-            elsif enable = '1' then
+            elsif valid_in = '1' then
                 for i in taps-1 downto 1 loop
                     data_pipe(i) <= data_pipe(i-1);
                 end loop;
