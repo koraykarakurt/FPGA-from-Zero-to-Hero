@@ -15,16 +15,16 @@ entity generic_multiplier is
 end entity;
 
 architecture behavioral of generic_multiplier is
+        signal result_u : unsigned(2*VECTOR_SIZE-1 downto 0);
+        signal result_s : signed(2*VECTOR_SIZE-1 downto 0);
 begin
     GEN_UNSIGNED: if MULTIPLIER_TYPE = 0 generate
-        signal result_u : unsigned(2*VECTOR_SIZE-1 downto 0);
     begin
         result_u <= resize(unsigned(mult_1) * unsigned(mult_2), 2*VECTOR_SIZE);
         mult_out <= std_logic_vector(result_u);
     end generate;
 
-    GEN_SIGNED: if MULTIPLIER_TYPE /= 0 generate
-        signal result_s : signed(2*VECTOR_SIZE-1 downto 0);
+    GEN_SIGNED: if MULTIPLIER_TYPE = 1 generate
     begin
         result_s <= resize(signed(mult_1) * signed(mult_2), 2*VECTOR_SIZE);
         mult_out <= std_logic_vector(result_s);
