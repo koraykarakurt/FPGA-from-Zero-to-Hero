@@ -16,16 +16,17 @@ end entity;
 
 architecture behavioral of generic_multiplier is
 begin
-    process(mult_1, mult_2)
-        variable signed_result : signed(2*VECTOR_SIZE-1 downto 0);
-        variable unsigned_result : unsigned(2*VECTOR_SIZE-1 downto 0);
+    GEN_UNSIGNED: if MULTIPLIER_TYPE = 0 generate
+        signal result_u : unsigned(2*VECTOR_SIZE-1 downto 0);
     begin
-        if MULTIPLIER_TYPE = 0 then
-            unsigned_result := resize(unsigned(mult_1) * unsigned(mult_2), 2*VECTOR_SIZE);
-            mult_out <= std_logic_vector(unsigned_result);
-        else
-            signed_result := resize(signed(mult_1) * signed(mult_2), 2*VECTOR_SIZE);
-            mult_out <= std_logic_vector(signed_result);
-        end if;
-    end process;
+        result_u <= resize(unsigned(mult_1) * unsigned(mult_2), 2*VECTOR_SIZE);
+        mult_out <= std_logic_vector(result_u);
+    end generate;
+
+    GEN_SIGNED: if MULTIPLIER_TYPE /= 0 generate
+        signal result_s : signed(2*VECTOR_SIZE-1 downto 0);
+    begin
+        result_s <= resize(signed(mult_1) * signed(mult_2), 2*VECTOR_SIZE);
+        mult_out <= std_logic_vector(result_s);
+    end generate;
 end architecture;
