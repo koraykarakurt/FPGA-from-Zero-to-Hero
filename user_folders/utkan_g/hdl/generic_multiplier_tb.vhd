@@ -7,18 +7,18 @@ end entity;
 
 architecture testbench of generic_multiplier_tb is
     -- 8-bit unsigned multiplier signals
-    signal mult_1_8bit_u    : std_logic_vector(7 downto 0);
-    signal mult_2_8bit_u    : std_logic_vector(7 downto 0);
+    signal mult_1_8bit_u    : std_logic_vector(7 downto 0) := (others => '0');
+    signal mult_2_8bit_u    : std_logic_vector(7 downto 0) := (others => '0');
     signal mult_out_8bit_u    : std_logic_vector(15 downto 0);
     
     -- 8-bit signed multiplier signals
-    signal mult_1_8bit_s    : std_logic_vector(7 downto 0);
-    signal mult_2_8bit_s    : std_logic_vector(7 downto 0);
-    signal mult_out_8bit_s    : std_logic_vector(15 downto 0);
+    signal mult_1_8bit_s    : std_logic_vector(7 downto 0) := (others => '0');
+    signal mult_2_8bit_s    : std_logic_vector(7 downto 0) := (others => '0');
+    signal mult_out_8bit_s    : std_logic_vector(15 downto 0) := (others => '0');
     
     -- 16-bit unsigned multiplier signals
-    signal mult_1_16bit_u   : std_logic_vector(15 downto 0);
-    signal mult_2_16bit_u   : std_logic_vector(15 downto 0);
+    signal mult_1_16bit_u   : std_logic_vector(15 downto 0) := (others => '0');
+    signal mult_2_16bit_u   : std_logic_vector(15 downto 0) := (others => '0');
     signal mult_out_16bit_u   : std_logic_vector(31 downto 0);
 
 begin
@@ -59,41 +59,45 @@ begin
         );
 
     -- Test process
-    test_proc: process
+    -- 8-bit Unsigned Test Process
+    test_proc_unsigned: process
     begin
+        report "Testing 8-bit unsigned multiplier...";
+        mult_1_8bit_u <= x"0A";
+        mult_2_8bit_u <= x"0B";
+        wait for 10 ns;
+        assert unsigned(mult_out_8bit_u) = 110
+            report "8-bit unsigned test failed"
+            severity error;
+        report "PASS: 8-bit unsigned multiplier test.";
+        wait;
+    end process;
+
+    -- 8-bit Signed Test Process
+    test_proc_signed: process
+    begin
+        report "Testing 8-bit signed multiplier...";
+        mult_1_8bit_s <= x"FA";
+        mult_2_8bit_s <= x"03";
+        wait for 10 ns;
+        assert signed(mult_out_8bit_s) = -18
+            report "8-bit signed test failed"
+            severity error;
+        report "PASS: 8-bit signed multiplier test.";
+        wait;
+    end process;
     
-        -- 8-bit unsigned test
-        mult_1_8bit_u <= x"0A";  -- 10
-        mult_2_8bit_u <= x"0B";  -- 11
+    -- 16-bit Unsigned Test Process
+    test_proc_16unsigned: process
+    begin
+        report "Testing 16-bit unsigned multiplier...";
+        mult_1_16bit_u <= x"00FF";
+        mult_2_16bit_u <= x"0002";
         wait for 10 ns;
-        if unsigned(mult_out_8bit_u) = 110 then
-            report "PASS: 8-bit unsigned test";
-        else
-            assert false report "FAIL: 8-bit unsigned test failed" severity error;
-        end if;
-
-
-        -- 8-bit signed test
-        mult_1_8bit_s <= x"FA";  -- -6
-        mult_2_8bit_s <= x"03";  -- 3
-        wait for 10 ns;
-         if signed(mult_out_8bit_s) = -18 then
-            report "PASS: 8-bit signed test";
-        else
-            assert false report "FAIL: 8-bit signed test failed" severity error;
-        end if;
-
-        -- 16-bit unsigned test
-        mult_1_16bit_u <= x"00FF";  -- 255
-        mult_2_16bit_u <= x"0002";  -- 2
-        wait for 10 ns;
-        if unsigned(mult_out_16bit_u) = 511 then
-            report "PASS: 16-bit unsigned test";
-        else
-            assert false report "FAIL: 16-bit unsigned test failed" severity error;
-        end if;
-
-        report "All tests completed.";
+        assert unsigned(mult_out_16bit_u) = 510
+            report "16-bit unsigned test failed"
+            severity error;
+        report "PASS: 16-bit unsigned multiplier test.";
         wait;
     end process;
 
