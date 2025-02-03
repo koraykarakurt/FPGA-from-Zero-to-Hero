@@ -1,32 +1,37 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+---------------------------------------------------------------------------------------------------
+-- Author : Utkan Genc
+-- Description : 
+--   
+--   
+--   
+-- More information (optional) :
+-- 
+-- 
+---------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
 
 entity generic_multiplier is
-    generic (
-        MULTIPLIER_TYPE : integer range 0 to 1 := 0; -- 0 for unsigned, 1 for signed
-        VECTOR_SIZE     : integer range 1 to 64 := 8  -- Width of the inputs
-    );
-    port (
-        mult_1 : in  std_logic_vector(VECTOR_SIZE-1 downto 0);
-        mult_2 : in  std_logic_vector(VECTOR_SIZE-1 downto 0);
-        mult_out : out std_logic_vector(2*VECTOR_SIZE-1 downto 0)
-    );
+   generic (
+      MULTIPLIER_TYPE : integer range 0 to 1 := 0;  -- 0 for unsigned, 1 for signed
+      DATA_WIDTH      : integer range 1 to 64 := 8  -- width of the inputs
+   );
+   port (
+      mult_in_1 : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+      mult_in_2 : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+      mult_out  : out std_logic_vector(2*DATA_WIDTH-1 downto 0)
+   );
 end entity;
 
 architecture behavioral of generic_multiplier is
-        signal result_u : unsigned(2*VECTOR_SIZE-1 downto 0);
-        signal result_s : signed(2*VECTOR_SIZE-1 downto 0);
 begin
-    GEN_UNSIGNED: if MULTIPLIER_TYPE = 0 generate
-    begin
-        result_u <= resize(unsigned(mult_1) * unsigned(mult_2), 2*VECTOR_SIZE);
-        mult_out <= std_logic_vector(result_u);
-    end generate;
-
-    GEN_SIGNED: if MULTIPLIER_TYPE = 1 generate
-    begin
-        result_s <= resize(signed(mult_1) * signed(mult_2), 2*VECTOR_SIZE);
-        mult_out <= std_logic_vector(result_s);
-    end generate;
+   gen_unsigned: if MULTIPLIER_TYPE = 0 generate
+   begin
+      mult_out <= std_logic_vector(unsigned(mult_in_1) * unsigned(mult_in_2));
+   end generate gen_unsigned;
+   gen_signed: if MULTIPLIER_TYPE = 1 generate
+   begin
+      mult_out <= std_logic_vector(signed(mult_in_1) * signed(mult_in_2));
+   end generate gen_signed;
 end architecture;
