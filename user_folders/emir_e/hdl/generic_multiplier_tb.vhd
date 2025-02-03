@@ -62,6 +62,7 @@ begin
     UNS_STIMULI : process
         variable rand_gen : RandomPType; -- Declare random generator as variable
         variable random_value_uns : integer;
+        variable err_inj_out : unsigned(2 * data_width - 1 downto 0);
         variable random_er_inj : boolean;
     begin
         -- Initialize the random generator
@@ -73,29 +74,28 @@ begin
                 uns_mult2 <= std_logic_vector(to_unsigned(mul_2, data_width));
                 expected_output_uns <= to_unsigned(mul_1, data_width) * to_unsigned(mul_2, data_width);
 
-                random_value_uns := rand_gen.RandInt(uns_loop_start, uns_loop_stop);
-                random_er_inj := (rand_gen.RandInt(0,1) = 1); --Randomizes the er_inj occurrence
+                random_er_inj := (rand_gen.RandInt(0,10) = 1); --Randomizes the er_inj occurrence
                 
                 wait for wait_time;
 
                 -- Error injection check for unsigned multiplication
-                if er_inj and (random_value_uns = mul_1) then
-                    assert uns_mult_o /= std_logic_vector(expected_output_uns)
-                            report "Error injection occurred for unsigned multiplication." severity note;
-                
-                elsif er_inj then
-                    assert uns_mult_o = std_logic_vector(expected_output_uns)
-                            report "Unsigned multiplication failed due to error injection: Expected " & 
-                                integer'image(to_integer(expected_output_uns)) & 
-                                ", Got " & integer'image(to_integer(unsigned(uns_mult_o)))
-                            severity error;
-                
-                else
-                    assert uns_mult_o = std_logic_vector(expected_output_uns)
-                            report "Unsigned multiplication failed without error injection: Expected " & 
-                                integer'image(to_integer(expected_output_uns)) & 
-                                ", Got " & integer'image(to_integer(unsigned(uns_mult_o)))
-                            severity error;
+                if random_er_inj then
+                	random_value_uns := rand_gen.RandInt(uns_loop_start, uns_loop_stop);
+					err_inj_out := to_unsigned(random_value_uns, data_width) * to_unsigned(mul_2, data_width);                     
+                    if expected_output_uns = err_inj_out then
+                    	assert uns_mult_o /= std_logic_vector(expected_output_uns)	
+        	            report "Error injection occured but system answer is correct"& 
+        	                    ", Got " &integer'image(to_integer(expected_output_s)) 
+                                severity note;
+					
+                    else
+                    	assert uns_mult_o = std_logic_vector(expected_output_uns)
+                        	report "Signed multiplication failed due to error injection: Expected " & 
+                            	integer'image(to_integer(expected_output_s)) & 
+                                ", Got " & integer'image(to_integer(err_inj_out))
+                             	severity error;
+                    
+					end if;
                 end if;
             end loop;
         end loop;
@@ -105,36 +105,41 @@ begin
 	S_STIMULI : process
         variable rand_gen : RandomPType; -- Declare random generator as variable
         variable random_value_s : integer;
+        variable err_inj_out : signed(2 * data_width - 1 downto 0);
+        variable random_er_inj : boolean;
     begin
         
         for mul_1 in s_loop_start to s_loop_stop loop
             for mul_2 in s_loop_start to s_loop_stop loop
                 s_mult1 <= std_logic_vector(to_signed(mul_1, data_width));
                 s_mult2 <= std_logic_vector(to_signed(mul_2, data_width));
+                s_mult_o <= std_logic_vector(to_signed(random_value_s, data_width) * to_signed(mul_2, data_width));
                 expected_output_s <= to_signed(mul_1, data_width) * to_signed(mul_2, data_width);
 
                 random_value_s := rand_gen.RandInt(s_loop_start, s_loop_stop);
+                random_er_inj := (rand_gen.RandInt(0,10) = 1); --Randomizes the er_inj occurrence
                 
                 wait for wait_time;
 
                 -- Error injection check for signed multiplication
-                if er_inj and (random_value_s = mul_1) then
-                    assert s_mult_o /= std_logic_vector(expected_output_s)
-                        report "Error injection occurred for signed multiplication." severity note;
-                elsif er_inj then
-                    assert s_mult_o = std_logic_vector(expected_output_s)
-                        report "Signed multiplication failed due to error injection: Expected " & 
-                            integer'image(to_integer(expected_output_s)) & 
-                                ", Got " & integer'image(to_integer(signed(s_mult_o)))
-                                severity error;
-                        
-                else
-                    assert s_mult_o = std_logic_vector(expected_output_s)
-                        report "Signed multiplication failed without error injection: Expected " & 
-                            integer'image(to_integer(expected_output_s)) & 
-                                ", Got " & integer'image(to_integer(signed(s_mult_o)))
-                                severity error;                
-
+                if random_er_inj then
+                	random_value_s := rand_gen.RandInt(s_loop_start, s_loop_stop);
+					err_inj_out := to_signed(random_value_s, data_width) * to_signed(mul_2, data_width);
+                    
+	                if expected_output_s = err_inj_out then
+    	                assert s_mult_o /= std_logic_vector(expected_output_s)
+        	                report "Error injection occured but system answer is correct"& 
+        	                    ", Got " &integer'image(to_integer(expected_output_s)) 
+                                severity note;
+            	    
+                	else
+	                    assert s_mult_o = std_logic_vector(expected_output_s)
+    	                    report "Signed multiplication failed due to error injection: Expected " & 
+        	                    integer'image(to_integer(expected_output_s)) & 
+            	                ", Got " & integer'image(to_integer(err_inj_out))
+                	            severity error;
+                                       
+					end if;
                 end if;
             end loop;
         end loop;
