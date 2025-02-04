@@ -1,5 +1,5 @@
 ---------------------------------------------------------------------------------------------------
--- Author : Halil Furkan KIMKAK
+-- Author :  Halil Furkan KIMKAK
 -- Description : Generic Multiplier Project
 --   
 --   
