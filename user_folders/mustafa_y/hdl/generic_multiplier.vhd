@@ -1,60 +1,37 @@
---============================================================================
--- Generic Multiplier Entity
---============================================================================
--- Description: Configurable signed/unsigned multiplier with parametric width
--- Generics:
---   MULT_TYPE - '0' = unsigned, '1' = signed
---   WIDTH     - Bit width of input operands (default 8-bit)
--- Ports:
---   a      - Input operand 1 (WIDTH-bit)
---   b      - Input operand 2 (WIDTH-bit)
---   result - Output product (2*WIDTH-bit)
+---------------------------------------------------------------------------------------------------
 -- Author : Mustafa Yetis
---Revision History:
---30.01.2025 - Created Initial code
---============================================================================
-
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+-- Description : Configurable signed/unsigned multiplier with parametric data_width
+---------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
 
 entity generic_multiplier is
    generic (
-      MULT_TYPE : std_logic := '0';  -- Multiplication type selector
-      WIDTH     : positive := 8      -- Operand bit width
+      mult_type		: std_logic := '0'; -- multiplication type selector, '0' = unsigned, '1' = signed
+      data_width	: positive  := 8    -- bit data_width of input operands (default 8-bit)
    );
    port (
-      a      : in  std_logic_vector(WIDTH-1 downto 0);
-      b      : in  std_logic_vector(WIDTH-1 downto 0);
-      result : out std_logic_vector(2*WIDTH-1 downto 0)
+      mult_in_1		: in  std_logic_vector(data_width-1 downto 0);
+      mult_in_2		: in  std_logic_vector(data_width-1 downto 0);
+      mult_out		: out std_logic_vector(2*data_width-1 downto 0)
    );
 end entity generic_multiplier;
 
 architecture rtl of generic_multiplier is
 begin
-
    ----------------------------------------------------------------------------
-   -- Unsigned Multiplication Block
+   -- unsigned multiplication block
    ----------------------------------------------------------------------------
-   unsigned_gen: if MULT_TYPE = '0' generate
-      signal a_unsigned : unsigned(WIDTH-1 downto 0);
-      signal b_unsigned : unsigned(WIDTH-1 downto 0);
+   unsigned_gen: if mult_type = '0' generate
    begin
-      a_unsigned <= unsigned(a);
-      b_unsigned <= unsigned(b);
-      result     <= std_logic_vector(a_unsigned * b_unsigned);
+      mult_out <= std_logic_vector(unsigned(mult_in_1) * unsigned(mult_in_2));
    end generate unsigned_gen;
-
    ----------------------------------------------------------------------------
-   -- Signed Multiplication Block
+   -- signed multiplication block
    ----------------------------------------------------------------------------
-   signed_gen: if MULT_TYPE = '1' generate
-      signal a_signed : signed(WIDTH-1 downto 0);
-      signal b_signed : signed(WIDTH-1 downto 0);
+   signed_gen: if mult_type = '1' generate
    begin
-      a_signed <= signed(a);
-      b_signed <= signed(b);
-      result   <= std_logic_vector(a_signed * b_signed);
+      mult_out <= std_logic_vector(signed(mult_in_1) * signed(mult_in_2));
    end generate signed_gen;
-
 end architecture rtl;

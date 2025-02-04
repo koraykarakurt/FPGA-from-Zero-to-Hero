@@ -24,7 +24,7 @@ end fully_parallel_systolic_fir_filter_tb;
 
 architecture bhv of fully_parallel_systolic_fir_filter_tb is
 
-  constant coeffs : real_vector := (0.01662606, -0.00696415, -0.03403663, -0.04855056);
+  constant coeff_pipe : real_vector := (0.01662606, -0.00696415, -0.03403663, -0.04855056);
 
   signal rst      : std_logic := '0';
   signal clk      : std_logic := '0';
@@ -43,11 +43,18 @@ constant filter_delay : natural := 1;
 
 begin
   dut : entity work.fully_parallel_systolic_fir_filter
-  generic map(coeffs => coeffs,
+  generic map(coeff_pipe => coeff_pipe,
               input_width => input_width, 
               output_width => output_width
 )
-
+  port map (
+      clk       => clk,
+      rst       => rst,
+      valid_in  => valid_in,
+      data_in   => data_in,
+      data_out  => data_out,
+      valid_out => valid_out
+);
 
   stim : process
   begin
@@ -57,7 +64,7 @@ begin
     rst <= '0';
     wait until rising_edge(clk);
     sample_driver : for i in 0 to 3 loop
-      data_in <= std_logic_vector(to_signed(integer(input_width_scale*coeffs(i)), 16));
+      data_in <= std_logic_vector(to_signed(integer(input_width_scale*coeff_pipe(i)), 16));
       wait until rising_edge(clk);
     end loop;
     data_in <= (others => '0');
@@ -79,11 +86,11 @@ begin
     for i in 0 to filter_delay loop
       wait until rising_edge(clk);
     end loop;
-    for i in 0 to coeffs'high + coeffs'high loop
+    for i in 0 to coeff_pipe'high + coeff_pipe'high loop
       current_output := 0.0;
-      for tap in coeffs'range loop
-        if(i-tap >= 0) and (i-tap <= coeffs'high) then
-          current_output := current_output + coeffs(tap) * real(to_signed(data_check(i-tap), 16));
+      for number_of_taps in coeff_pipe'range loop
+        if(i-number_of_taps >= 0) and (i-number_of_taps <= coeff_pipe'high) then
+          current_output := current_output + coeff_pipe(number_of_taps) * real(to_signed(data_check(i-number_of_taps), 16));
           end if;
         end loop;
         data_check <= std_logic_vector(to_signed(integer(trunc(output_width_scale * current_output)), 16));
