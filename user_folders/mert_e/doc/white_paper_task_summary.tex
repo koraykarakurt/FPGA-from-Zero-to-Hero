@@ -1,0 +1,96 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+
+\title{Summary of Xilinx White Papers on FPGA Reset and Design Prioritization}
+
+\date{\today}
+
+\begin{document}
+	
+	\maketitle
+	
+	\section{Introduction}
+	This document provides a summary of two Xilinx white papers: 
+	\begin{itemize}
+		\item \textbf{WP272: Get Smart About Reset: Think Local, Not Global}
+		\item \textbf{WP275: Get Your Priorities Right – Make Your Design Up to 50\% Smaller}
+	\end{itemize}
+	In both paper, reset mechanisms and the effectiveness of logic implementation are discussed in relation to FPGA design optimization.
+	
+	\section{WP272: Get Smart About Reset: Think Local, Not Global}
+	
+	\subsection{Avoiding Global Reset}
+	Traditional digital design often relies on a global reset for all flip-flops, but this approach is inefficient in FPGA design. Main topics for this issue are:
+	\begin{itemize}
+		\item Global reset signals introduce unnecessary routing complexity.
+		\item The timing of reset release can cause unstability.
+		\item FPGA configuration automatically initializes registers, making global resets redundant in most cases.
+	\end{itemize}
+	
+	\subsection{Reset Timing Issues}
+	Global reset signals are typically slow but must still meet timing constraints when de-asserted. High fan-out distribution increases skew, potentially causing some flip-flops to exit reset one clock cycle later than others. This problem is particularly critical for:
+	\begin{itemize}
+		\item One-hot state machines, which may lose their active state.
+		\item Feedback-based circuits, such as infinite impulse response (IIR) filters, where an incorrect reset can introduce long-term errors.
+	\end{itemize}
+	
+	\subsection{Localized Reset Strategy}
+	The recommendation to designing localized reset networks:
+	\begin{itemize}
+		\item Use synchronous reset mechanisms.
+		\item Target only flip-flops that need explicit initialization.
+		\item Avoid unnecessary resets in purely combinational or pipeline-based designs.
+	\end{itemize}
+	
+	\subsection{Cost of Global Resets}
+	The highlights of the drawbacks of global resets:
+	\begin{itemize}
+		\item Increased resource utilization due to additional logic and routing.
+		\item Performance degradation due to added propagation delays.
+		\item Reduced efficiency of FPGA features like shift register LUTs (SRL16E), which cannot support resets.
+	\end{itemize}
+	
+	\section{WP275: Get Your Priorities Right – Make Your Design Up to 50\% Smaller}
+	
+	\subsection{Logic Optimization}
+	FPGA designs should prioritize efficient logic implementation. The implementations are:
+	\begin{itemize}
+		\item \textbf{Single-level logic:} Functions with four or fewer inputs fit within a single LUT, maximizing performance.
+		\item \textbf{Two-level logic:} Functions with more than four inputs require multiple LUTs, doubling area and increasing delay.
+	\end{itemize}
+	
+	\subsection{Efficient Flip-Flop Control}
+	Flip-flops in Xilinx FPGAs have dedicated control inputs for set, reset, and enable. Improper use of these signals can result in:
+	\begin{itemize}
+		\item Additional LUT-based logic, increasing resource usage.
+		\item Unintended priority conflicts between reset, set, and enable signals.
+		\item Lower performance issues due to multi-level logic.
+	\end{itemize}
+	
+	\subsection{Best Practices for Register Control}
+	The guidelines for writing HDL code that aligns with FPGA hardware:
+	\begin{itemize}
+		\item Avoid mixing synchronous and asynchronous controls on the same flip-flop.
+		\item Ensure the priority order of enable, set, and reset signals matches FPGA architecture.
+		\item Prefer synchronous resets over asynchronous resets to improve timing closure.
+	\end{itemize}
+	
+	\subsection{Writing Sympathetic Code}
+	The importance of writing HDL that is "sympathetic" to FPGA hardware constraints:
+	\begin{itemize}
+		\item Understanding flip-flop priority rules helps synthesis tools generate optimal logic.
+		\item Using built-in FPGA resources efficiently can significantly reduce design size and increase speed.
+		\item Removing unnecessary global resets and restructuring logic can improve overall system performance.
+	\end{itemize}
+	
+	\section{Conclusion}
+	The essential insights into optimizing FPGA designs are:
+	\begin{itemize}
+		\item Eliminating unnecessary global resets and adopting localized reset strategies.
+		\item Structuring logic to fit within single LUTs where possible.
+		\item Writing HDL code that aligns with FPGA hardware capabilities and priority rules.
+	\end{itemize}
+	By following these best practices, designers can create smaller, faster, and more efficient FPGA implementations.
+	
+\end{document}
