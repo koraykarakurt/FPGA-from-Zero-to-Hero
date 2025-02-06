@@ -2,7 +2,7 @@
 -- Company: FalsePaths
 -- Engineer: Emir EROL
 -- 
--- Create Date: 01/23/2025 04:54:56 PM
+-- Create Date: 02/03/2025
 -- Design Name: 
 -- Module Name: generic_multiplier - Behavioral_rtl
 -- Project Name: Generic Multiplier
@@ -27,7 +27,7 @@ use IEEE.numeric_std.all;
 entity generic_multiplier is
 
 	generic(
-    	sign : integer := 0;  -- 0: unsigned, 1: signed
+    	sign : boolean := false; 
         size : integer := 8);
     
     port(	
@@ -41,15 +41,12 @@ end generic_multiplier;
 architecture behavioral_rtl of generic_multiplier is
 begin
 
-	process(mult_1, mult_2)
-    begin
-    
-    	if sign = 1 then
+	signed_gen : if(sign) generate
     		mult_o <= std_logic_vector(signed(mult_1) * signed(mult_2));
-        
-    	else
+	end generate;
+			
+    unsigned_gen : if(not sign) generate
     		mult_o <= std_logic_vector(unsigned(mult_1) * unsigned(mult_2));
-        
-        end if;
-	end process;        
+	end generate;    
+          
 end behavioral_rtl;
