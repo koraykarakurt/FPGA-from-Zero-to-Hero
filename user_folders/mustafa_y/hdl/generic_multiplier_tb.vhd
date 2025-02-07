@@ -6,6 +6,8 @@
 -- Usage:
 -- 1. Normal mode: Verify correct multiplication results
 -- 2. Error mode: Inject errors to test assertion mechanism
+-- Here is the c code below to check how signed value interpreted as unsigned value
+--    int8_t si8 = -128;        uint8_t ui8 = *((uint8_t*)&si8);      printf("si8 as ui8 : %u",ui8);
 ---------------------------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -25,6 +27,10 @@ architecture tb of generic_multiplier_tb is
    signal mult_in_2_signed		: std_logic_vector(mult_in_width-1 downto 0)		:= (others => '0');
    signal mult_out_signed		: std_logic_vector(2*mult_in_width-1 downto 0);
 
+   signal unsigned_test_finish_flag     : std_logic     :='0';
+   signal signed_test_finish_flag       : std_logic     :='0';
+   signal global_test_finish_flag       : std_logic     :='0';
+   
    -- Declare the test case array as a constant
    constant test_cases : test_case_array := init_test_cases; --calling init function from pkg to initialize the test case array
 
@@ -57,11 +63,10 @@ begin
    ----------------------------------------------------------------------------------------------------
    -- test process
    ----------------------------------------------------------------------------------------------------
-   process
+   p_unsigned:process
    begin
       -- Initial delay
       wait for wait_time_1;
-
       ----------------------------------------------------------------------------------------------------
       -- Unsigned mode tests
       ----------------------------------------------------------------------------------------------------
@@ -72,7 +77,17 @@ begin
          wait for wait_time_2;
          check_result(mult_in_1_unsig, mult_in_2_unsig, mult_out_unsig, false, test_cases(i).inject_err);
       end loop;
-      
+      ----------------------------------------------------------------------------------------------------
+      -- finish signed test
+      ----------------------------------------------------------------------------------------------------
+      wait for wait_time_1;
+      unsigned_test_finish_flag <= '1';
+   end process p_unsigned;
+
+   p_signed: process
+   begin
+      -- Initial delay
+      wait for wait_time_1;     
       ----------------------------------------------------------------------------------------------------
       -- Signed mode tests
       ----------------------------------------------------------------------------------------------------
@@ -83,13 +98,24 @@ begin
          wait for wait_time_2;
          check_result(mult_in_1_signed, mult_in_2_signed, mult_out_signed, true, test_cases(i).inject_err);
       end loop;
-
+      ----------------------------------------------------------------------------------------------------
+      -- finish signed test 
+      ----------------------------------------------------------------------------------------------------
+      wait for wait_time_1;
+      signed_test_finish_flag <= '1';
+   end process p_signed;
+   
+   p_finish: process
+   begin
+      -- Initial delay
+      wait for wait_time_1;
       ----------------------------------------------------------------------------------------------------
       -- Test summary
       ----------------------------------------------------------------------------------------------------
-      wait for wait_time_1;
-      report "test completed successfully" severity note;
-      wait;
-   end process;
-
+      wait until global_test_finish_flag = '1';
+      report "Simulation Finished" severity note;
+      std.env.stop;
+   end process p_finish;
+      
+   global_test_finish_flag <= signed_test_finish_flag  and unsigned_test_finish_flag;
 end architecture tb;
