@@ -4,6 +4,7 @@ use IEEE.numeric_std.all;
 
 use work.fir_filter_pkg.all;
 
+-- koray_k, review note: update file and entity name 
 entity partly_systolic_fir_filter is
 	
 	generic
@@ -30,6 +31,7 @@ end entity;
 
 architecture behavioral of partly_systolic_fir_filter is
 	
+   
 	attribute multstyle : string;
 	attribute multstyle of behavioral : architecture is "dsp";
 	
@@ -38,11 +40,11 @@ architecture behavioral of partly_systolic_fir_filter is
 	type data_array	is array (filter_taps-1 downto 0) of signed(data_width-1 downto 0);
 	
 	signal data_arr 					: data_array := (others => (others=>'0'));
-	signal data_count 				: integer range 0 to filter_taps := 0;
-	signal filtered_data_arr_full	: std_logic :='0'; 
+	signal data_count 				: integer range 0 to filter_taps-1 := 0; 
+	signal filtered_data_arr_full	: std_logic := '0'; 
 	signal mult_res_full 			: std_logic := '0';
 	signal par_stage					: integer range 0 to par_ser_factor := 0;
-	signal data_o_count				: integer range 0 to filter_taps	:= 0;
+	signal data_o_count				: integer range 0 to filter_taps-1	:= 0;
 	
 	type filtered_data_array is array (filter_taps-1 downto 0) of signed(data_width+coeff_width-1 downto 0);
 	signal filtered_data_arr : filtered_data_array := (others => (others=>'0')); 
