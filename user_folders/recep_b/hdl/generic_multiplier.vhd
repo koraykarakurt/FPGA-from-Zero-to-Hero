@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------
--- Company: 
+-- Company: FPGA Zero-to-Hero
 -- Engineer: Recep Büyüktuncer
 -- 
 -- Create Date: 01/31/2025 08:16:06 PM
