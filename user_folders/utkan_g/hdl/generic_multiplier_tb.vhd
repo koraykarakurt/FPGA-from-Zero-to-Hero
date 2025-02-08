@@ -58,6 +58,8 @@ architecture behavioral of generic_multiplier_tb is
    shared variable v_test_cases_failures : natural := 0;
 
 begin
+
+
    -- ==============================
    -- DUT INSTANTIATION
    -- ==============================   
@@ -85,8 +87,11 @@ begin
 			mult_in_2 => mult_in_2_s,
 			mult_out => mult_out_s
 		);
-
+   -- koray_k, review note 1: replace the tabs with three spaces, in this code there are many tab characters still
+   
    -- ==============================
+   -- koray_k, review note 2: remove ============================== kind of comments only uppercase LOGGING CONFIGURATION is enough
+   
    -- LOGGING CONFIGURATION
    -- ==============================
    
@@ -119,6 +124,7 @@ begin
 			
 			mult_out_u_expected <= to_unsigned(v_rand_val1_u * v_rand_val2_u, 2*DATA_WIDTH);
 			
+         -- koray_k, review note 3: do not use magic numbers but constants whose type is time for wait for statements
 			wait for 10 ns;
 
 			if v_error_injection = 0 then
@@ -185,6 +191,7 @@ begin
 
 			mult_out_s_expected <= to_signed(v_rand_val1_s * v_rand_val2_s, 2*DATA_WIDTH);
 
+         -- koray_k, review note 4: do not use magic numbers but constants whose type is time for wait for statements
 			wait for 10 ns;
 
 			if v_error_injection = 0 then
@@ -258,5 +265,8 @@ begin
 		std.env.stop;
 		wait;
 	end process simulation_control_proc;
+   
+   -- koray_k, review note 5: good job but 260+ lines of code for this testbench is too many, you shall shorten it.
+
 
 end architecture;
