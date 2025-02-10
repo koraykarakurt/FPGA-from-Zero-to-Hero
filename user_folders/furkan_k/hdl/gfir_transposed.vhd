@@ -40,7 +40,6 @@ entity gfir_transposed is
       output_len    : integer := 24  -- filter output length
    );
    port (
-      reset         : in  std_logic; -- active high reset -- not sure it is necessary or not
       clock         : in  std_logic; -- system clock
       filter_data_i : in  std_logic_vector(input_len  - 1 downto 0); -- filter's input
       filter_data_o : out std_logic_vector(input_len + coeff_len - 1 downto 0)  -- filter's output
@@ -73,11 +72,11 @@ architecture behavioral of gfir_transposed is
       x"000C", x"0005", x"0001", x"0000"
    );
 
-   signal product_ar     : product_inp_coeff;
-   signal add_ar         : add_res;
+   signal product_ar     : product_inp_coeff := (others => (others => '0'));
+   signal add_ar         : add_res           := (others => (others => '0'));
 
    -- signals
-   signal mult1_d0       : signed(input_len + coeff_len - 1 downto 0);
+   signal mult1_d0       : signed(input_len + coeff_len - 1 downto 0) := (others => '0');
 
    -- attributes
    attribute use_dsp               : string;
@@ -88,12 +87,7 @@ begin
    -- this process is used to implement Transposed FIR Filter
    transposed_fir_p : process (reset, clock)
    begin
-      if (reset = '1') then 
-         product_ar             <= (others => (others => '0'));
-         filter_data_o          <= (others => '0');
-         add_ar                 <= (others => (others => '0'));
-         mult1_d0               <= (others => '0');
-      elsif (rising_edge(clock)) then 
+      if (rising_edge(clock)) then 
 
          -- this for loop is used to calculate multiplication of input data and filter coefficients
          for mult_idx in 0 to filter_taps - 1 loop 
@@ -101,18 +95,18 @@ begin
          end loop;
 
          -- this delays first product 
-         mult1_d0               <= product_ar(0);
+         mult1_d0                <= product_ar(0);
 
          -- this for loop is used to add delayed and non-delayed product
          -- for the first stage delayed version of first product and second product added
          -- other stages adds previous sum and next product
          for add_idx in 0 to filter_taps - 2 loop
             if (add_idx = filter_taps - 2) then 
-               filter_data_o      <= std_logic_vector(add_ar(filter_taps - 3) + product_ar(filter_taps - 1)); -- output of transposed FIR filter means filtered data which is converted from signed to std_logic_vector 
+               filter_data_o     <= std_logic_vector(add_ar(filter_taps - 3) + product_ar(filter_taps - 1)); -- output of transposed FIR filter means filtered data which is converted from signed to std_logic_vector 
             elsif (add_idx = 0) then 
-               add_ar(0)          <= mult1_d0 + product_ar(1);
+               add_ar(0)         <= mult1_d0 + product_ar(1);
             else 
-               add_ar(add_idx)    <= add_ar(add_idx - 1) + product_ar(add_idx + 1);
+               add_ar(add_idx)   <= add_ar(add_idx - 1) + product_ar(add_idx + 1);
             end if;
          end loop;
 
