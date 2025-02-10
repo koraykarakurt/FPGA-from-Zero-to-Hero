@@ -85,7 +85,7 @@ architecture behavioral of gfir_transposed is
 begin
 
    -- this process is used to implement Transposed FIR Filter
-   transposed_fir_p : process (reset, clock)
+   transposed_fir_p : process (clock)
    begin
       if (rising_edge(clock)) then 
 
