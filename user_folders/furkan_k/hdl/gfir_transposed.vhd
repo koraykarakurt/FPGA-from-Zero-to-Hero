@@ -40,9 +40,12 @@ entity gfir_transposed is
       output_len    : integer := 24  -- filter output length
    );
    port (
-      clock         : in  std_logic; -- system clock
-      filter_data_i : in  std_logic_vector(input_len  - 1 downto 0); -- filter's input
-      filter_data_o : out std_logic_vector(input_len + coeff_len - 1 downto 0)  -- filter's output
+      clock         : in  std_logic;                                            -- system clock
+      reset         : in  std_logic;                                            -- synchronous active-high reset
+      filter_data_i : in  std_logic_vector(input_len  - 1 downto 0);            -- filter's input
+      din_vld       : in  std_logic;                                            -- valid indicator of the filter's input  | if '1' input  of the filter is valid else invalid
+      filter_data_o : out std_logic_vector(input_len + coeff_len - 1 downto 0); -- filter's output
+      dout_vld      : out std_logic                                             -- valid indicator of the filter's output | if '1' output of the filter is valid else invalid
    );
 end gfir_transposed;
 
@@ -88,28 +91,38 @@ begin
    transposed_fir_p : process (clock)
    begin
       if (rising_edge(clock)) then 
-
-         -- this for loop is used to calculate multiplication of input data and filter coefficients
-         for mult_idx in 0 to filter_taps - 1 loop 
-            product_ar(mult_idx) <= signed(filter_data_i) * filter_coeff(mult_idx); -- Q2: when converting from signed to integer, what will be the integer size default 32 bit or optimized according to signed vectors width?
-         end loop;
-
-         -- this delays first product 
-         mult1_d0                <= product_ar(0);
-
-         -- this for loop is used to add delayed and non-delayed product
-         -- for the first stage delayed version of first product and second product added
-         -- other stages adds previous sum and next product
-         for add_idx in 0 to filter_taps - 2 loop
-            if (add_idx = filter_taps - 2) then 
-               filter_data_o     <= std_logic_vector(add_ar(filter_taps - 3) + product_ar(filter_taps - 1)); -- output of transposed FIR filter means filtered data which is converted from signed to std_logic_vector 
-            elsif (add_idx = 0) then 
-               add_ar(0)         <= mult1_d0 + product_ar(1);
-            else 
-               add_ar(add_idx)   <= add_ar(add_idx - 1) + product_ar(add_idx + 1);
+         if (reset = '1') then
+            filter_data_o              <= (others => '0');
+            dout_vld                   <= '0';
+         else
+            if (din_vld = '1') then -- validity check of the filter's input if '1' input of the filter is valid -----------***************************(?) not sure usage of din_vld is correct or not
+               
+               -- this for loop is used to calculate multiplication of input data and filter coefficients
+               for mult_idx in 0 to filter_taps - 1 loop 
+                  product_ar(mult_idx) <= signed(filter_data_i) * filter_coeff(mult_idx); -- Q2: when converting from signed to integer, what will be the integer size default 32 bit or optimized according to signed vectors width?
+               end loop;
+               
+               -- this delays first product 
+               mult1_d0                <= product_ar(0);
+               
+               -- this for loop is used to add delayed and non-delayed product
+               -- for the first stage delayed version of first product and second product added
+               -- other stages adds previous sum and next product
+               for add_idx in 0 to filter_taps - 2 loop
+                  if (add_idx = filter_taps - 2) then 
+                     filter_data_o     <= std_logic_vector(add_ar(filter_taps - 3) + product_ar(filter_taps - 1)); -- output of transposed FIR filter means filtered data which is converted from signed to std_logic_vector 
+                     dout_vld          <= '1';
+                  elsif (add_idx = 0) then 
+                     add_ar(0)         <= mult1_d0 + product_ar(1);
+                  else 
+                     add_ar(add_idx)   <= add_ar(add_idx - 1) + product_ar(add_idx + 1);
+                  end if;
+               end loop;
+            
+            else -----------***************************(?) not sure usage of din_vld is correct or not
+               dout_vld                <= '0';
             end if;
-         end loop;
-
+         end if;
       end if;
    end process transposed_fir_p;
 
