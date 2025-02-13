@@ -24,7 +24,7 @@ use IEEE.NUMERIC_STD.all;
 entity multiplayer_v1 is
     generic(
         multi_type : STD_LOGIC := '0';
-        sizes_of_multiplier : integer := 8
+        sizes_of_multiplier : integer range 1 to 18 := 8
     );
     Port ( 
         mult_1  : in STD_LOGIC_VECTOR (sizes_of_multiplier-1 downto 0);
