@@ -27,6 +27,7 @@
 	\end{itemize}
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
 	
 	\section{Chapter 1: Digital Signal Processing Design Challenges}
 	\chapter{XtremeDSP Design Considerations}
@@ -44,6 +45,14 @@
 		\item Pipeline registers for optimizing speed vs. latency.
 		\item Dedicated input/output registers for high-speed operation.
 	\end{itemize}
+	\newpage
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/Ekran görüntüsü 2025-02-16 143539.png}
+		\label{fig:enter-label}
+	\end{figure}
+	
 	
 	\subsection{Instantiation in VHDL and Verilog}
 	\subsubsection{VHDL Instantiation}
@@ -91,6 +100,7 @@
 	The DSP48 slice is an essential building block in high-speed DSP applications, offering low-power, high-throughput computation with dedicated interconnects. Its efficient hardware utilization makes it ideal for FIR filtering, complex MAC operations, and arithmetic-intensive tasks.
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
 	
 	\section{Chapter 2: XtremeDSP Slice and Virtex-4 FPGA Architecture}
 	The DSP48 slice in Xilinx FPGAs efficiently performs various math functions, including:
@@ -101,6 +111,12 @@
 		\item Square-root functions, shifters
 	\end{itemize}
 	A dedicated pipeline stage ensures high-performance arithmetic operations.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/3_dsp_slice.png}
+		\label{fig:enter-label}
+	\end{figure}
 	
 	\subsection{Basic Math Functions}
 	
@@ -125,6 +141,12 @@
 	\]
 	where \(P\) is the accumulated product.
 	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/2_fully_pipelined_multip.png}
+		\label{fig:enter-label}
+	\end{figure}
+	
 	\subsubsection{Multiplexer}
 	The DSP48 slice features three multiplexers (Y: 3:1, X: 4:1, Z: 6:1), which can be configured for signal routing.
 	
@@ -147,6 +169,12 @@
 	\subsubsection{Square Root Calculation}
 	The square root is computed iteratively using a method similar to division.
 	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/3_square_root.png}
+		\label{fig:enter-label}
+	\end{figure}
+	
 	\subsubsection{Sum of Squares}
 	The DSP48 slice can compute:
 	\[
@@ -158,12 +186,19 @@
 	The DSP48 slice enables efficient implementation of fundamental mathematical operations in FPGA designs.
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
 	
 	\section{Chapter 3: MAC FIR Filter Implementation}
 	Finite Impulse Response (FIR) filters are widely used in digital signal processing (DSP) applications. This chapter focuses on the Multiply-Accumulate (MAC) FIR filter architecture implemented using the DSP48 slice in Xilinx Virtex-4 FPGAs. The DSP48 slice provides enhanced arithmetic capabilities, allowing for efficient MAC FIR filter designs. The chapter covers different architectures, including single-multiplier and dual-multiplier implementations, and discusses optimization techniques for performance, resource utilization, and power efficiency.
 	
 	\subsection{Single-Multiplier MAC FIR Filter}
 	A single-multiplier MAC FIR filter is a sequential filtering approach that uses a single multiplier combined with an accumulator to process incoming data. The key advantage of this approach is its reduced hardware complexity, as it minimizes the number of multipliers needed. However, this design comes at the cost of lower throughput, which is inversely proportional to the number of filter taps.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/4_single_mac_fir_filter.png}
+		\label{fig:enter-label}
+	\end{figure}
 	
 	The general FIR filter operation follows the equation:
 	\begin{equation}
@@ -189,6 +224,12 @@
 		(X_0 \cdot C_0) + (X_n \cdot C_n) \rightarrow (X_0 + X_n) \cdot C_0, \quad \text{if } C_0 = C_n
 	\end{equation}
 	This approach doubles the sample rate, making it particularly beneficial for high-speed applications. However, it introduces additional resource requirements, such as an extra memory read port and a pre-adder.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/4_symmetric_mac_fir.png}
+		\label{fig:enter-label}
+	\end{figure}
 	
 	\subsection{Dual-Multiplier MAC FIR Filter}
 	To further enhance throughput, a dual-multiplier MAC FIR filter employs two multipliers operating in parallel. This structure increases data processing efficiency by allowing two sets of input samples to be processed simultaneously. The architecture consists of:
@@ -232,6 +273,7 @@
 	By selecting the appropriate architecture and optimization techniques, designers can achieve high-performance filtering with minimal resource usage. The reference designs available in VHDL, Verilog, and System Generator for DSP allow for easy customization and adaptation to different application needs.
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
 	
 	\section{Chapter 4: Parallel FIR Filter Implementations}
 	
@@ -256,6 +298,14 @@
 	\subsubsection{Direct Form Type I}
 	This is the fundamental parallel FIR filter structure where all multiplications and additions occur simultaneously.
 	
+	\newpage
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/5_direct_form_fir.png}
+		\label{fig:enter-label}
+	\end{figure}
+	
 	\subsubsection{Transposed FIR Filter}
 	This structure optimally maps to the DSP48 slices by chaining operations efficiently:
 	\begin{itemize}
@@ -264,6 +314,12 @@
 		\item Efficient utilization of DSP slices
 	\end{itemize}
 	The main disadvantage is its limited performance due to high fanout for large filter orders.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/5_transposed_fir.png}
+		\label{fig:enter-label}
+	\end{figure}
 	
 	\subsubsection{Systolic FIR Filter}
 	A more optimized solution for parallel processing:
@@ -274,12 +330,24 @@
 	\end{itemize}
 	The primary drawback is higher latency, which increases with filter order.
 	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/5_systolic_fir.png}
+		\label{fig:enter-label}
+	\end{figure}
+	
 	\subsubsection{Symmetric Systolic FIR Filter}
 	This architecture exploits coefficient symmetry to reduce DSP slice usage. The optimized equation is:
 	\begin{equation}
 		(x_0 h_0 + x_N h_N) = (x_0 + x_N) h_0 \quad \text{if } h_0 = h_N
 	\end{equation}
 	which halves the number of required multipliers.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/5_symmetric_systolic.png}
+		\label{fig:enter-label}
+	\end{figure}
 	
 	\subsection{Rounding and Performance}
 	To manage bit growth in parallel FIR filters, rounding is applied:
@@ -289,11 +357,18 @@
 	\end{itemize}
 	Performance comparisons indicate that Virtex-4 FPGA achieves higher speed and lower power consumption compared to previous generations.
 	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/5_rounding_systolic_fir.png}
+		\label{fig:enter-label}
+	\end{figure}
+	
 	\subsection{Conclusion}
 	Parallel FIR filters provide significant advantages in FPGA-based DSP applications. The Virtex-4 DSP48 slice allows flexible and efficient implementations of various FIR filter architectures, enabling high-speed signal processing with minimal resource usage.
 	
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
 	
 	\section{Chapter 5: Semi-Parallel FIR Filter Implementations}
 	\subsection{Overview}
@@ -319,6 +394,12 @@
 		\text{Clock Cycles per Result} = \frac{N}{M}
 	\end{equation}
 	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/6_semi_parallel_fir.png}
+		\label{fig:enter-label}
+	\end{figure}
+	
 	\subsection{Four-Multiplier, Distributed-RAM-Based Semi-Parallel FIR Filter}
 	This implementation uses four DSP48 slices in an accumulation mode. Key specifications:
 	\begin{itemize}
@@ -342,6 +423,12 @@
 		\item Clock Cycles per Result: 100
 	\end{itemize}
 	Block RAM is used for coefficient memory and cyclic data buffering.
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/6_block_ram_based_semi_parall_fir_filter.png}
+		\label{fig:enter-label}
+	\end{figure}
 	
 	\subsection{Other Semi-Parallel FIR Filter Structures}
 	Alternative architectures include:
@@ -370,6 +457,7 @@
 	Semi-parallel FIR filters are widely used in FPGA-based DSP applications due to their efficiency. The choice of architecture depends on sample rate, coefficient count, and available hardware resources.
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
 	
 	\section{Chapter 6: Multi-Channel FIR Filters}
 	Multi-channel FIR filters efficiently process multiple input streams by leveraging high-speed DSP resources. The Virtex-4 FPGA utilizes DSP48 slices to implement such filters with increased silicon efficiency. Instead of separate filters for each channel, a single FIR filter can process multiple channels through time-multiplexing, reducing resource usage.
@@ -380,6 +468,12 @@
 		\item Coefficient ROMs or RAMs using SRL16Es.
 		\item DSP48 slices for multiplication and accumulation.
 	\end{itemize}
+	
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.5\linewidth]{Figures/7_multi_channel_fir_filter.png}
+		\label{fig:enter-label}
+	\end{figure}
 	
 	The DSP48 tile cascades multiple processing elements, optimizing arithmetic operations. Input streams are combined via a high-speed shift register, and coefficient storage allows for static or adaptive filtering.
 	
