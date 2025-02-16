@@ -24,9 +24,9 @@ end fully_parallel_systolic_fir_filter_tb;
 architecture behavioral of fully_parallel_systolic_fir_filter_tb is
 
    constant number_of_taps  : natural := 4;  
-   constant input_width     : natural := 16;
-   constant coeff_width     : natural := 16;
-   constant mac_width       : integer := input_width;
+   constant input_width     : natural := 18;
+   constant coeff_width     : natural := 18;
+   constant output_width    : integer := 54;
    
    constant clk_period      : time := 10 ns;
    constant rst_time        : time := 20 ns;
@@ -54,7 +54,7 @@ architecture behavioral of fully_parallel_systolic_fir_filter_tb is
    signal rst            : std_logic := '1';
    signal data_in        : std_logic_vector(input_width-1 downto 0) := (others => '0');
    signal valid_in       : std_logic := '0';
-   signal data_out       : std_logic_vector(input_width + coeff_width + mac_width - 1 downto 0);
+   signal data_out       : std_logic_vector(output_width - 1 downto 0);
    signal valid_out      : std_logic;
 
 begin

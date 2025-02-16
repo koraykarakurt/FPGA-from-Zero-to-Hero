@@ -23,8 +23,8 @@ use IEEE.numeric_std.all;
 entity fully_parallel_systolic_fir_filter is
    generic (
       number_of_taps        : integer := 4; 
-      input_width           : natural := 16;
-      coeff_width           : natural := 16;
+      input_width           : natural := 18;
+      coeff_width           : natural := 18;
       output_width          : natural := 54 -- guard_bits = 54 - 18 - 18 = 18
     );
    port (
@@ -54,10 +54,10 @@ architecture behavioral of fully_parallel_systolic_fir_filter is
 
    type pipeline_coeffs is array (0 to number_of_taps-1) of signed(coeff_width-1 downto 0);
       constant coeff_pipe   : pipeline_coeffs := (
-      x"0001", x"0002", x"0003", x"0004"
+      "00" & x"0001", "00" & x"0002", "00" & x"0003", "00" & x"0004"
    );
 
-   type pipeline_products is array (0 to number_of_taps-1) of signed(mac_width-1 downto 0);
+   type pipeline_products is array (0 to number_of_taps-1) of signed(input_width+coeff_width-1 downto 0);
    signal product_pipe  : pipeline_products := (others => (others => '0'));
 
    type pipeline_sums is array (0 to number_of_taps-1) of signed(output_width-1 downto 0);
@@ -73,6 +73,7 @@ begin
                 product_pipe <= (others => (others => '0'));
                 sum_pipe <= (others => (others => '0'));
                 valid_pipe  <= (others => '0');
+                valid_out   <= '0';
             elsif valid_in = '1' then
                 for i in number_of_taps-1 downto 1 loop
                     data_pipe(i) <= data_pipe(i-1);
