@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------------------------------
+-- Author : Ege ömer Göksu
+-- Description : Example code requested by Koray Karakurt.
+-- FIFO generic length, each element is one byte
+--   
+--   
+-- More information (optional) :
+--    
+--    
+---------------------------------------------------------------------------------------------------
