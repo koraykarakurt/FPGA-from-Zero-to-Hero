@@ -39,8 +39,8 @@ port(
 	clk 		: in std_logic;
 	reset 		: in std_logic; --active low
 	data_in		: in std_logic_vector(7 downto 0);
-	write_en	: in std_logic;
-	read_en		: in std_logic;
+	write_en	: in std_logic := '0';
+	read_en		: in std_logic := '0';
 	full		: out std_logic;
 	empty		: out std_logic;
 	data_out	: out std_logic_vector (7 downto 0)
