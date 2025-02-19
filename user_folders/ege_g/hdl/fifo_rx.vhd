@@ -1,7 +1,7 @@
 ---------------------------------------------------------------------------------------------------
 -- Author : Ege ömer Göksu
 -- Description : Example code requested by Koray Karakurt.
--- FIFO generic length, each element is one byte
+-- FIFO generic length and data length
 --   
 --   
 -- More information (optional) :
@@ -13,33 +13,34 @@ use IEEE.std_logic_1164.all;
 
 entity fifo_rx is
 generic(
-	fifo_length : integer := 64
+	FIFO_LENGTH : integer := 64;
+   DATA_LENGTH : integer := 8
 );
 port(
 	clk 		: in std_logic;
-	reset 	: in std_logic; --active high
-	data_in	: in std_logic_vector(7 downto 0);
+	rst 	   : in std_logic; --active high
+	data_in	: in std_logic_vector(DATA_LENGTH-1 downto 0);
 	write_en	: in std_logic;
 	read_en	: in std_logic;
 	full		: out std_logic;
 	empty		: out std_logic;
-	data_out	: out std_logic_vector (7 downto 0)
+	data_out	: out std_logic_vector (DATA_LENGTH-1 downto 0)
 );
 end fifo_rx;
 
 architecture logic of fifo_rx is
-type mem is array (0 to fifo_length-1) of std_logic_vector(7 downto 0);
+type mem is array (0 to FIFO_LENGTH-1) of std_logic_vector(DATA_LENGTH-1 downto 0);
 signal fifo_buffer 	: mem;
-signal write_ptr	   : integer range 0 to fifo_length-1 := 0;
-signal read_ptr		: integer range 0 to fifo_length-1 := 0;
-signal fifo_count    : integer range 0 to fifo_length   := 0;
+signal write_ptr	   : integer range 0 to FIFO_LENGTH-1 := 0;
+signal read_ptr		: integer range 0 to FIFO_LENGTH-1 := 0;
+signal fifo_count    : integer range 0 to FIFO_LENGTH   := 0;
 signal full_int		: std_logic := '0';
 signal empty_int	   : std_logic := '1';
 
 begin
 process(clk) begin
 	if rising_edge(clk) then
-      if (reset = '1') then
+      if (rst = '1') then
 			write_ptr 	<= 0;
 			read_ptr 	<= 0;
          fifo_count  <= 0;
@@ -65,13 +66,13 @@ process(clk) begin
          
          --write operation
          if (write_en = '1' and full_int = '0') then
-				write_ptr   <= (write_ptr + 1) mod fifo_length;	
+				write_ptr   <= (write_ptr + 1) mod FIFO_LENGTH;	
             fifo_buffer(write_ptr) <= data_in;
 			end if;
          
          --read operation
 			if (read_en = '1' and empty_int = '0') then
-				read_ptr    <= (read_ptr + 1) mod fifo_length;
+				read_ptr    <= (read_ptr + 1) mod FIFO_LENGTH;
             data_out    <= fifo_buffer(read_ptr);
 			end if;
 		end if;
@@ -79,7 +80,7 @@ process(clk) begin
 end process;
 
 process(fifo_count) begin
-   if (fifo_count = fifo_length) then 
+   if (fifo_count = FIFO_LENGTH) then 
       empty_int   <= '0';
       full_int    <= '1';
    elsif (fifo_count = 0) then
