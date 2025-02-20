@@ -12,7 +12,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
-entity generic_sycnhronizer is
+entity generic_synchronizer is
    generic (
       FPGA_VENDOR         : string               := "xilinx"; -- FPGA vendor name, valid values --> "xilinx", "general"
       RESET_ACTIVE_STATUS : std_logic            := '1'; -- '0': active low, '1': active high
@@ -24,9 +24,9 @@ entity generic_sycnhronizer is
       data_in  : in std_logic; -- asynchronous data input
       data_out : out std_logic -- synchronous data output
    );
-end generic_sycnhronizer;
+end generic_synchronizer;
 
-architecture behavioral of generic_sycnhronizer is
+architecture behavioral of generic_synchronizer is
 
 begin
 

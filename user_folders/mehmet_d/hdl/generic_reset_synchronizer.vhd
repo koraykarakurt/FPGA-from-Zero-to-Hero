@@ -12,7 +12,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 
-entity generic_reset_sycnhronizer is
+entity generic_reset_synchronizer is
    generic (
       FPGA_VENDOR         : string               := "xilinx"; -- FPGA vendor name, valid values --> "xilinx", "general"
       RESET_ACTIVE_STATUS : std_logic            := '1'; -- '0': active low, '1': active high
@@ -23,9 +23,9 @@ entity generic_reset_sycnhronizer is
       rst_in  : in std_logic; -- asynchronous reset input
       rst_out : out std_logic -- asynchronously asserted synchronously de-asserted output
    );
-end generic_reset_sycnhronizer;
+end generic_reset_synchronizer;
 
-architecture behavioral of generic_reset_sycnhronizer is
+architecture behavioral of generic_reset_synchronizer is
 
    signal rst_reg : std_logic_vector(RST_SYNCH_FF_NUMBER - 1 downto 0) := (others => (not RESET_ACTIVE_STATUS));
 
