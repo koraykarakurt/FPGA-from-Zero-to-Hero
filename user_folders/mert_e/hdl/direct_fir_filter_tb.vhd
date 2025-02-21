@@ -3,7 +3,7 @@
 -- 
 -- Create Date: 24.01.2025 11:37:01
 -- Design Name: 
--- Module Name: fully_transposed_systolic_fir_filter_tb - bhv
+-- Module Name: direct_fir_filter_tb - behavioral
 -- Project Name: FILTER
 -- Target Devices: Design will be optimized for Sipeed Tang Primer 20k Dock-Ext board
 -- Tool Versions: Gowin EDA
@@ -18,10 +18,10 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
-entity fully_parallel_systolic_fir_filter_tb is
-end fully_parallel_systolic_fir_filter_tb;
+entity direct_fir_filter_tb is
+end direct_fir_filter_tb;
 
-architecture behavioral of fully_parallel_systolic_fir_filter_tb is
+architecture behavioral of direct_fir_filter_tb is
 
    constant number_of_taps  : natural := 4;  
    constant input_width     : natural := 18;

@@ -3,7 +3,7 @@
 -- 
 -- Create Date: 19.01.2025 22:14:16
 -- Design Name: 
--- Module Name: fully_transposed_systolic_fir_filter - Behavioral
+-- Module Name: direct_fir_filter - behavioral
 -- Project Name: FILTER
 -- Target Devices: Design will be optimized for Sipeed Tang Primer 20k Dock-Ext board
 -- Tool Versions: Gowin EDA
@@ -20,7 +20,7 @@ use IEEE.numeric_std.all;
 --library gw2a;
 --use gw2a.components.all;
 
-entity fully_parallel_systolic_fir_filter is
+entity direct_fir_filter is
    generic (
       number_of_taps        : integer := 4; 
       input_width           : natural := 18;
@@ -37,9 +37,9 @@ entity fully_parallel_systolic_fir_filter is
       -- 31/01/2025, review note by koray_k 
       -- remove suffixes _i _o, and add valid output
    );
-end fully_parallel_systolic_fir_filter;
+end direct_fir_filter;
 
-architecture behavioral of fully_parallel_systolic_fir_filter is
+architecture behavioral of direct_fir_filter is
 
    -- Constant for the multiplication width
    constant mac_width       : integer := output_width;
