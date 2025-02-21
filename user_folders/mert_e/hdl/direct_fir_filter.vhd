@@ -58,10 +58,10 @@ architecture behavioral of direct_fir_filter is
    );
 
    type pipeline_products is array (0 to number_of_taps-1) of signed(input_width+coeff_width-1 downto 0);
-   signal product_pipe  : pipeline_products := (others => (others => '0'));
+   signal product_pipe      : pipeline_products := (others => (others => '0'));
 
    type pipeline_sums is array (0 to number_of_taps-1) of signed(output_width-1 downto 0);
-   signal sum_pipe      : pipeline_sums := (others => (others => '0'));
+   signal sum_pipe          : pipeline_sums := (others => (others => '0'));
 
 begin
 
@@ -69,14 +69,14 @@ begin
     begin
         if rising_edge(clk) then
             if rst = '1' then
-                data_pipe <= (others => (others => '0'));
-                product_pipe <= (others => (others => '0'));
-                sum_pipe <= (others => (others => '0'));
-                valid_pipe  <= (others => '0');
-                valid_out   <= '0';
+                data_pipe           <= (others => (others => '0'));
+                product_pipe        <= (others => (others => '0'));
+                sum_pipe            <= (others => (others => '0'));
+                valid_pipe          <= (others => '0');
+                valid_out           <= '0';
             elsif valid_in = '1' then
                 for i in number_of_taps-1 downto 1 loop
-                    data_pipe(i) <= data_pipe(i-1);
+                    data_pipe(i)    <= data_pipe(i-1);
                 end loop;
                 data_pipe(0) <= signed(data_in);
                 -- Performing of multiplications and accumulations
