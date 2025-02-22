@@ -14,13 +14,13 @@ use IEEE.numeric_std.all;
 
 entity generic_multiplier is
    Generic (    
-      SWITCHER        :       boolean                 := true;
-      MULT_LEN        :       integer range 1 to 64   := 16
+      SWITCHER : boolean               := true;
+      MULT_LEN : integer range 1 to 64 := 16
    );
    Port (    
-      mult_in_1       :       in      std_logic_vector(MULT_LEN-1 downto 0);      
-      mult_in_2       :       in      std_logic_vector(MULT_LEN-1 downto 0);     
-      mult_out        :       out     std_logic_vector((2*MULT_LEN)-1 downto 0)     
+      mult_in_1 : in std_logic_vector(MULT_LEN-1 downto 0);      
+      mult_in_2 : in std_logic_vector(MULT_LEN-1 downto 0);     
+      mult_out  : out std_logic_vector((2*MULT_LEN)-1 downto 0)     
    );
 end generic_multiplier;
 
