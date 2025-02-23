@@ -7,18 +7,17 @@
 -- Project Name: FILTER
 -- Target Devices: Design will be optimized for Sipeed Tang Primer 20k Dock-Ext board
 -- Tool Versions: Gowin EDA
--- Description: 
+-- Description: Direct Form FIR Filter using FIR Filter Package
 -- 
--- Dependencies: 
+-- Dependencies: fir_filter_coeffs.vhd
 -- 
 -- Revision:
--- Revision 0.04 - Edit errors and add libraries for using DSP units
+-- Revision 0.06 - Edit of process loop
 
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
---library gw2a;
---use gw2a.components.all;
+use work.fir_filter_coeffs.all;
 
 entity direct_fir_filter is
    generic (
@@ -34,8 +33,6 @@ entity direct_fir_filter is
       data_in               : in  std_logic_vector(input_width-1 downto 0);
       data_out              : out std_logic_vector(output_width-1 downto 0);
       valid_out             : out std_logic
-      -- 31/01/2025, review note by koray_k 
-      -- remove suffixes _i _o, and add valid output
    );
 end direct_fir_filter;
 
@@ -43,19 +40,14 @@ architecture behavioral of direct_fir_filter is
 
    -- Constant for the multiplication width
    constant mac_width       : integer := output_width;
-   -- 31/01/2025, review note by koray_k 
-   -- add guard bits for macc otherwise it may overflow/underflow fast
-
 
    -- Type definitions for systolic pipeline stages
    type pipeline_data is array (0 to number_of_taps-1) of signed(input_width-1 downto 0);
    signal data_pipe         : pipeline_data := (others => (others => '0'));
    signal valid_pipe        : std_logic_vector(number_of_taps-1 downto 0) := (others => '0');
 
-   type pipeline_coeffs is array (0 to number_of_taps-1) of signed(coeff_width-1 downto 0);
-      constant coeff_pipe   : pipeline_coeffs := (
-      "00" & x"0001", "00" & x"0002", "00" & x"0003", "00" & x"0004"
-   );
+   -- Use Coefficients from fir_filter_coeffs
+   signal coeff_pipe : pipeline_coeffs := coeff_pipe;
 
    type pipeline_products is array (0 to number_of_taps-1) of signed(input_width+coeff_width-1 downto 0);
    signal product_pipe      : pipeline_products := (others => (others => '0'));
@@ -75,24 +67,37 @@ begin
                 valid_pipe          <= (others => '0');
                 valid_out           <= '0';
             elsif valid_in = '1' then
-                for i in number_of_taps-1 downto 1 loop
-                    data_pipe(i)    <= data_pipe(i-1);
+            
+                variable i : integer := number_of_taps-1;
+                while i > 0 loop
+                    data_pipe(i) <= data_pipe(i-1);
+                    i := i - 1;
                 end loop;
                 data_pipe(0) <= signed(data_in);
-                -- Performing of multiplications and accumulations
-                for i in 0 to number_of_taps-1 loop
+
+                -- Performing multiplications and accumulations
+                i := 0;
+                while i < number_of_taps loop
                     product_pipe(i) <= data_pipe(i) * coeff_pipe(i);
                     if i = 0 then
                         sum_pipe(i) <= resize(product_pipe(i), output_width);
                     else
                         sum_pipe(i) <= sum_pipe(i-1) + resize(product_pipe(i), output_width);
                     end if;
-               -- 31/01/2025, review note by koray_k 
-               -- check functionality of this code
+                    i := i + 1;
                 end loop;
+
+                valid_pipe(0) <= valid_in;
+                i := 1;
+                while i < number_of_taps loop
+                    valid_pipe(i) <= valid_pipe(i-1);
+                    i := i + 1;
+                end loop;
+                valid_out <= valid_pipe(number_of_taps-1);
             end if;
         end if;
     end process;
+    
     data_out <= std_logic_vector(sum_pipe(number_of_taps-1));
 
 end behavioral;
