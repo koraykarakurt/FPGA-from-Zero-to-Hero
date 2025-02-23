@@ -1,12 +1,16 @@
 ---------------------------------------------------------------------------------------------------
 -- Author      :  Halil Furkan KIMKAK
 -- Description :  Testbench for Generic Multiplier
---                - Tests both signed and unsigned multiplication
+--                - Tests both signed and unsigned multiplication using random test values
+--                - Generates random numbers for each test:
+--                  * Signed: Random numbers between -2^(MULT_LEN-1) and 2^(MULT_LEN-1)-1
+--                  * Unsigned: Random numbers between 0 and 2^MULT_LEN-1
 --                - Verifies multiplication results against expected values
 ---------------------------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.math_real.all; -- For random number generation
 
 entity generic_multiplier_tb is
 end generic_multiplier_tb;
@@ -44,6 +48,46 @@ architecture behavioral of generic_multiplier_tb is
     -- Test status signals
     signal test_done     : boolean := false; -- Test done
     signal error_count   : integer := 0; -- Error count
+    
+    -- Shared variables for random number generation
+    shared variable seed1 : positive := 1;
+    shared variable seed2 : positive := 1;
+    
+    -- Random number generation function
+    function random_slv(len: integer; signed_val: boolean) return std_logic_vector is
+        variable r: real;
+        variable rand_max: integer;
+        variable rand_val: integer;
+        variable result: std_logic_vector(len-1 downto 0);
+    begin
+        -- Determine maximum value based on signed/unsigned
+        if signed_val then
+            rand_max := 2**(len-1) - 1;  -- For signed
+        else
+            rand_max := 2**len - 1;      -- For unsigned
+        end if;
+
+        -- Generate random number
+        uniform(seed1, seed2, r);  -- Random real number between 0 and 1
+        rand_val := integer(r * real(rand_max));
+
+        -- For signed numbers, generate negative with 50% probability
+        if signed_val then
+            uniform(seed1, seed2, r);
+            if r > 0.5 then
+                rand_val := -rand_val;
+            end if;
+        end if;
+
+        -- Convert integer to std_logic_vector
+        if signed_val then
+            result := std_logic_vector(to_signed(rand_val, len));
+        else
+            result := std_logic_vector(to_unsigned(rand_val, len));
+        end if;
+
+        return result;
+    end function;
     
 begin
     -- Instantiate signed multiplier
@@ -84,13 +128,11 @@ begin
         
         wait for CLK_PERIOD * 2;  -- Wait for initial stabilization
 
-        -- Test Case 1: Signed multiplication
-        s_mult_in_1 <= "1000101011110101";  -- -29,979 (decimal)
-        s_mult_in_2 <= "0001100100010010";  -- 6,418 (decimal)
-        
-        -- Test Case 1: Unsigned multiplication
-        u_mult_in_1 <= "0110101011110101";  -- 27,381 (decimal)
-        u_mult_in_2 <= "0001100100010010";  -- 6,418 (decimal)
+        -- Generate random test values
+        s_mult_in_1 <= random_slv(MULT_LEN, true);   -- Random signed number
+        s_mult_in_2 <= random_slv(MULT_LEN, true);   -- Random signed number
+        u_mult_in_1 <= random_slv(MULT_LEN, false);  -- Random unsigned number
+        u_mult_in_2 <= random_slv(MULT_LEN, false);  -- Random unsigned number
         
         -- Wait for inputs to propagate
         wait for CLK_PERIOD/2;
