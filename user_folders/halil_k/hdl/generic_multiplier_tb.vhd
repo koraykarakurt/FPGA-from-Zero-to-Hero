@@ -1,11 +1,13 @@
 ---------------------------------------------------------------------------------------------------
 -- Author      :  Halil Furkan KIMKAK
 -- Description :  Testbench for Generic Multiplier
+--                - Performs 100 test iterations with random values
 --                - Tests both signed and unsigned multiplication using random test values
 --                - Generates random numbers for each test:
 --                  * Signed: Random numbers between -2^(MULT_LEN-1) and 2^(MULT_LEN-1)-1
 --                  * Unsigned: Random numbers between 0 and 2^MULT_LEN-1
 --                - Verifies multiplication results against expected values
+--                - Reports detailed test results for each iteration
 ---------------------------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -19,6 +21,7 @@ architecture behavioral of generic_multiplier_tb is
     -- Constants
     constant MULT_LEN      : integer := 16; -- Multiplier length
     constant CLK_PERIOD    : time := 10 ns; -- Clock period
+    constant NUM_TESTS     : integer := 100; -- Number of test iterations
    
     -- Component declaration for generic_multiplier
     component generic_multiplier is
@@ -48,6 +51,7 @@ architecture behavioral of generic_multiplier_tb is
     -- Test status signals
     signal test_done     : boolean := false; -- Test done
     signal error_count   : integer := 0; -- Error count
+    signal test_number    : integer := 0; -- Current test number
     
     -- Shared variables for random number generation
     shared variable seed1 : positive := 1;
@@ -128,52 +132,73 @@ begin
         
         wait for CLK_PERIOD * 2;  -- Wait for initial stabilization
 
-        -- Generate random test values
-        s_mult_in_1 <= random_slv(MULT_LEN, true);   -- Random signed number
-        s_mult_in_2 <= random_slv(MULT_LEN, true);   -- Random signed number
-        u_mult_in_1 <= random_slv(MULT_LEN, false);  -- Random unsigned number
-        u_mult_in_2 <= random_slv(MULT_LEN, false);  -- Random unsigned number
-        
-        -- Wait for inputs to propagate
-        wait for CLK_PERIOD/2;
-        
-        -- Calculate expected results
-        v_s_expected := std_logic_vector(signed(s_mult_in_1) * signed(s_mult_in_2)); -- Signed multiplication
-        v_u_expected := std_logic_vector(unsigned(u_mult_in_1) * unsigned(u_mult_in_2)); -- Unsigned multiplication
-        
-        -- Assign expected values to signals
-        s_expected_out <= v_s_expected; -- Expected signed output
-        u_expected_out <= v_u_expected; -- Expected unsigned output
-        
-        -- Wait for multiplier outputs to stabilize
-        wait for CLK_PERIOD/2;
-        
-        -- Signed multiplication check
-        if s_mult_out /= v_s_expected then
-            report "Signed multiplication error."
-            severity error;
-            error_count <= error_count + 1;
-        end if;                
+        -- Run multiple test iterations
+        for i in 1 to NUM_TESTS loop
+            test_number <= i;  -- Update current test number
+            
+            -- Generate random test values
+            s_mult_in_1 <= random_slv(MULT_LEN, true);   -- Random signed number
+            s_mult_in_2 <= random_slv(MULT_LEN, true);   -- Random signed number
+            u_mult_in_1 <= random_slv(MULT_LEN, false);  -- Random unsigned number
+            u_mult_in_2 <= random_slv(MULT_LEN, false);  -- Random unsigned number
+            
+            -- Wait for inputs to propagate
+            wait for CLK_PERIOD/2;
+            
+            -- Calculate expected results
+            v_s_expected := std_logic_vector(signed(s_mult_in_1) * signed(s_mult_in_2));
+            v_u_expected := std_logic_vector(unsigned(u_mult_in_1) * unsigned(u_mult_in_2));
+            
+            -- Assign expected values to signals
+            s_expected_out <= v_s_expected;
+            u_expected_out <= v_u_expected;
+            
+            -- Wait for multiplier outputs to stabilize
+            wait for CLK_PERIOD/2;
+            
+            -- Report current test values
+            report "Test #" & integer'image(i) & ": " &
+                  "Signed: " & integer'image(to_integer(signed(s_mult_in_1))) & " * " & 
+                  integer'image(to_integer(signed(s_mult_in_2))) & " = " &
+                  integer'image(to_integer(signed(s_mult_out))) &
+                  ", Expected: " & integer'image(to_integer(signed(v_s_expected)))
+            severity note;
+            
+            report "Test #" & integer'image(i) & ": " &
+                  "Unsigned: " & integer'image(to_integer(unsigned(u_mult_in_1))) & " * " & 
+                  integer'image(to_integer(unsigned(u_mult_in_2))) & " = " &
+                  integer'image(to_integer(unsigned(u_mult_out))) &
+                  ", Expected: " & integer'image(to_integer(unsigned(v_u_expected)))
+            severity note;
+            
+            -- Signed multiplication check
+            if s_mult_out /= v_s_expected then
+                report "Test #" & integer'image(i) & ": Signed multiplication error"
+                severity error;
+                error_count <= error_count + 1;
+            end if;                
 
-        -- Unsigned multiplication check
-        if u_mult_out /= v_u_expected then
-            report "Unsigned multiplication error."
-            severity error;
-            error_count <= error_count + 1;
-        end if;
-      
-        wait for CLK_PERIOD/2;
+            -- Unsigned multiplication check
+            if u_mult_out /= v_u_expected then
+                report "Test #" & integer'image(i) & ": Unsigned multiplication error"
+                severity error;
+                error_count <= error_count + 1;
+            end if;
+            
+            wait for CLK_PERIOD;
+        end loop;
         
         -- Report test completion
         test_done <= true; -- Test done
         wait for CLK_PERIOD;
         
         if error_count = 0 then
-            report "Test completed successfully with no errors!"
-                severity note; -- Report test completion
+            report "All " & integer'image(NUM_TESTS) & " test iterations completed successfully!"
+                severity note;
         else
-            report "Test completed with " & integer'image(error_count) & " errors."
-                severity error; -- Report test completion
+            report "Test completed with " & integer'image(error_count) & " errors out of " & 
+                  integer'image(NUM_TESTS * 2) & " total multiplications."
+                severity error;
         end if;
             
         wait;
