@@ -1,30 +1,24 @@
-----------------------------------------------------------------------------------
--- Company:  FPGA_FROM_ZERO_TO_HERO
--- Engineer: Abdullah Furkan Kaya
+---------------------------------------------------------------------------------------------------
+-- Author : Abdullah Furkan Kaya
+-- Description : Transposed FIR Filter design
+--   
+--   
+--  
+-- More information (optional) :
 -- 
--- Create Date: 15.01.2025 21:33:19
--- Design Name: 
--- Module Name: gfir_transposed - Behavioral
--- Project Name: FILTER
--- Target Devices: Design will be optimized for ZedBoard
--- Tool Versions: Xilinx Vivado 2023.2
--- Description: 
--- 
--- Dependencies: 
--- 
--- Revision:
--- Revision 0.03 - File Created
--- Additional Comments:
---
----- TO DO:
--- 1 -> What should be the width of output? How this output should be assigned with the last sum? Because we are adding bunch of numbers
--- 2 -> Make coeff_len generic more usable if filter coefficients has fixed length remove this generic. coefficients constant array could be DYNAMIC array
--- 3 -> Overflow underflow issue should be solved with the pattern detector logic
-----------------------------------------------------------------------------------
+-- TO DO:
+--   1 -> What should be the width of output? How this output should be assigned with the last sum? Because we are adding bunch of numbers
+--   2 -> Make coeff_len generic more usable if filter coefficients has fixed length remove this generic. coefficients constant array could be DYNAMIC array
+--   3 -> Overflow underflow issue should be solved with the pattern detector logic
+--    
+---------------------------------------------------------------------------------------------------
 
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+
+library work;
+use work.gfir_transposed_pkg.all;
 
 entity gfir_transposed is
    generic (
@@ -47,33 +41,9 @@ architecture behavioral of gfir_transposed is
 
    -- types 
    type product_inp_coeff is array (0 to filter_taps - 1) of signed(input_len + coeff_len - 1 downto 0);
-   type add_res           is array (0 to filter_taps - 3) of signed(input_len + coeff_len - 1 downto 0);
-   type coefficients      is array (0 to filter_taps - 1) of signed(coeff_len - 1             downto 0);
+   type add_res           is array (0 to filter_taps - 3) of signed(input_len + coeff_len - 1 downto 0); 
 
    -- type related constants & signals
---   constant filter_coeff : coefficients := (
---      x"0000", x"0001", x"0005", x"000C", 
---      x"0016", x"0025", x"0037", x"004E", 
---      x"0069", x"008B", x"00B2", x"00E0", 
---      x"0114", x"014E", x"018E", x"01D3", 
---      x"021D", x"026A", x"02BA", x"030B", 
---      x"035B", x"03AA", x"03F5", x"043B", 
---      x"047B", x"04B2", x"04E0", x"0504", 
---      x"051C", x"0528", x"0528", x"051C", 
---      x"0504", x"04E0", x"04B2", x"047B", 
---      x"043B", x"03F5", x"03AA", x"035B", 
---      x"030B", x"02BA", x"026A", x"021D", 
---      x"01D3", x"018E", x"014E", x"0114", 
---      x"00E0", x"00B2", x"008B", x"0069", 
---      x"004E", x"0037", x"0025", x"0016", 
---      x"000C", x"0005", x"0001", x"0000"
---   );
-
-   constant filter_coeff : coefficients := (
-      x"0001", x"0002", x"0003", x"0004", x"0005" 
-   );
-
-
    signal product_ar     : product_inp_coeff := (others => (others => '0'));
    signal add_ar         : add_res           := (others => (others => '0'));
 
@@ -129,7 +99,6 @@ begin
                add_ar                  <= (others => (others => '0')); --************ (?) 
                product_ar              <= (others => (others => '0')); --************ (?) 
             end if;
-
          end if;
       end if;
    end process transposed_fir_p;
