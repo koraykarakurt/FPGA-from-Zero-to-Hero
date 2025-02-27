@@ -1,7 +1,7 @@
 ---------------------------------------------------------------------------------------------------
 -- Author : Mustafa YETIS
 -- Description: Single-Bit Clock Domain Crossing Synchronizer
---					 2/3-stage synchronizer for single-bit signals crossing clock domains   
+--					 2/3/4-stage synchronizer for single-bit signals crossing clock domains   
 --   
 -- More information (optional) :
 -- 		Platform : FPGA Vendor-Independent        	
@@ -12,13 +12,11 @@ use IEEE.numeric_std.all;
 
 entity generic_singlebit_cdc is
   generic (
-    VENDOR              : string   := "Xilinx";	-- FPGA vendor ("Xilinx", "Intel")
-    RESET_ACTIVE_STATUS : std_logic := '1';		-- Active level of reset ('0' or '1')
-    SYNCH_FF_NUMBER     : integer  := 2			-- Number of sync stages (default 2)
+    VENDOR              : string   := "Xilinx";			-- FPGA vendor ("Xilinx", "Intel")
+    SYNCH_FF_NUMBER     : integer range 2 to 4 := 2	-- Number of sync stages (default 2)
   );
   port (
     clk_dest   : in  std_logic;  -- Destination clock
-    rst_async  : in  std_logic;	-- Asynchronous reset
     data_async : in  std_logic;	-- Asynchronous input signal
     data_sync  : out std_logic	-- Synchronized output signal
   );
@@ -30,19 +28,16 @@ begin
 
   ------------------------------------------------------------------------------
   -- Synchronizer Process: Metastability-hardened shift register
-  -- - Resets all FFs to '0' when rst_async is active
   -- - Shifts input data through chain on clk_dest edges
   ------------------------------------------------------------------------------
-  process(clk_dest, rst_async)
+  process(clk_dest)
   begin
-    if rst_async = RESET_ACTIVE_STATUS then
-      sync_chain <= (others => '0');
-    elsif rising_edge(clk_dest) then
+    if rising_edge(clk_dest) then
       sync_chain <= sync_chain(SYNCH_FF_NUMBER-2 downto 0) & data_async;
     end if;
   end process;
 
-  data_sync <= sync_chain(SYNCH_FF_NUMBER-1);
+  data_sync <= sync_chain(SYNCH_FF_NUMBER-1);--MSB of shift reg is directed as synchronized data
 
   ------------------------------------------------------------------------------
   -- Vendor-Specific Metastability Attributes
