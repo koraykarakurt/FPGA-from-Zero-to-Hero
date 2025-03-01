@@ -54,8 +54,8 @@ begin
 	end generate xilinx_version;
 	
 	efinix_version : if (VENDOR = "efinix") generate
-		attribute async_reg : string;
-		attribute async_reg of data_sync_buffer : signal is "true";
+		attribute async_reg: boolean;
+		attribute async_reg of data_sync_buffer : signal is true;
 
 		efinix_rst_sync : process(clk, rst_in)
 		begin
