@@ -27,19 +27,19 @@ end generic_reset_bridge;
 
 architecture behavioral of generic_reset_bridge is
    -- xilinx attribute definitions
-   attribute async_reg        : string;
-   attribute dont_touch       : string;
-   attribute iob              : string;
+   attribute async_reg  : string;
+   attribute dont_touch : string;
+   attribute iob        : string;
    -- xilinx iob attribute is here since iob attribute requires entity port
-   attribute iob of rst_in    : signal is "true";
+   attribute iob of rst_in : signal is "true";
    -- altera attribute definitions
    attribute altera_attribute : string;
    attribute preserve         : boolean;
-   attribute dont_merge                  : boolean;
+   attribute dont_merge       : boolean;
 begin
 
    xilinx_gen : if VENDOR = "xilinx" generate
-      signal rst_reg : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS);
+      signal rst_reg                  : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS);
       attribute async_reg of rst_reg  : signal is "true";
       attribute dont_touch of rst_reg : signal is "true";
    begin
@@ -53,9 +53,9 @@ begin
       end process xilinx;
       rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out      
    end generate xilinx_gen;
-   
+
    altera_gen : if VENDOR = "altera" generate
-      signal rst_reg : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others =>  RESET_ACTIVE_STATUS);
+      signal rst_reg                        : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS);
       attribute altera_attribute of rst_reg : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
       attribute dont_merge of rst_reg       : signal is true;
       attribute preserve of rst_reg         : signal is true;
@@ -70,7 +70,7 @@ begin
       end process altera;
       rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out
    end generate altera_gen;
-   
+
    other_gen : if VENDOR = "other" generate
       signal rst_reg : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS);
    begin
@@ -78,12 +78,11 @@ begin
       begin
          if rst_in = RESET_ACTIVE_STATUS then
             rst_reg <= (others => RESET_ACTIVE_STATUS);
-
          elsif rising_edge(clk) then
             rst_reg <= rst_reg(SYNCH_FF_NUMBER - 2 downto 0) & (not RESET_ACTIVE_STATUS); -- shift left
          end if;
       end process other_vendors;
       rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out
    end generate other_gen;
-   
+
 end behavioral;
