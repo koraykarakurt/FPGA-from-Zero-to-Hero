@@ -1,7 +1,7 @@
 ---------------------------------------------------------------------------------------------------
 -- Author : Ege Ömer Göksu
 -- Description : generic_reset_bridge
--- 
+--  
 -- More information (optional) :
 --Takes an asynchronous reset as input.
 --The output (rst_o) is an asynchronous assertion/synchronous de-assertion reset.
