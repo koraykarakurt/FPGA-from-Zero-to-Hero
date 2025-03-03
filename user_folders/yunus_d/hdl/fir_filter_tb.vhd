@@ -1,47 +1,41 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
-
 
 entity fir_filter_tb is
 end fir_filter_tb;
 
 architecture Behavioral of fir_filter_tb is
--- Constants
-constant clk_period       : time := 10 ns;
-constant NUMBER_OF_TAP    : integer := 5;
-constant COEFF_WIDTH      : natural := 18;
-constant INPUT_WIDTH      : natural := 25;
-constant OUTPUT_WIDTH     : natural := 48;
 
-
--- FIR Filter component
 component fir_filter_wrapper is
 generic(
 INPUT_WIDTH    : natural := 25;
 OUTPUT_WIDTH   : natural := 48
 );
 Port(
-clk         : in std_logic;
-rst         : in std_logic;
-valid_in    : in std_logic;
-data_in     : in std_logic_vector(INPUT_WIDTH-1 downto 0);
-data_out    : out std_logic_vector(OUTPUT_WIDTH-1 downto 0);
-valid_out   : out std_logic
+clk		: in std_logic;
+rst		: in std_logic;
+valid_in : in std_logic;
+data_in  : in std_logic_vector(INPUT_WIDTH-1 downto 0);
+data_out : out std_logic_vector(OUTPUT_WIDTH-1 downto 0);
+valid_out: out std_logic
 );
 end component;
 
--- Signals
-signal clk       	: std_logic := '0';
-signal rst       	: std_logic := '1'; -- Start with reset active
+constant clk_period       : time := 10 ns;
+constant NUMBER_OF_TAP    : integer := 5;
+constant COEFF_WIDTH      : natural := 18;
+constant INPUT_WIDTH      : natural := 25;
+constant OUTPUT_WIDTH     : natural := 48;
 
+signal clk       	: std_logic := '0';
+signal rst       	: std_logic := '1'; 
 signal data_out  	: std_logic_vector(OUTPUT_WIDTH -1 downto 0);
 signal valid_in  	: std_logic := '0';
 signal valid_out 	: std_logic;
 signal data_in    : std_logic_vector(INPUT_WIDTH-1 downto 0);
-
 begin
--- Clock Process
+
 clk_process: process
 begin
 	clk <= '0';
@@ -50,7 +44,6 @@ begin
 	wait for clk_period / 2;
 end process;
 
--- Process to Feed Inputs and Check Result
 process begin
 
 	rst <= '1';
@@ -69,7 +62,6 @@ process begin
 	
 end process;
 
--- Instantiate the FIR filter
 uut: fir_filter_wrapper
 generic map (
 	INPUT_WIDTH    => INPUT_WIDTH,
