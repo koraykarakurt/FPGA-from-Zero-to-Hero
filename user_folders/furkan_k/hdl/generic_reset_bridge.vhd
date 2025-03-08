@@ -15,7 +15,7 @@ use IEEE.numeric_std.all;
 
 entity generic_reset_bridge is
    generic (
-      VENDOR              : string               := "xilinx"; -- choose "xilinx" OR "altera"
+      VENDOR              : string               := "xilinx"; -- FPGA vendor -- choose "xilinx" OR "altera"
       RESET_ACTIVE_STATUS : std_logic            := '1';      -- active high and active low indicator -- '0' --> active low | '1' --> active high
       SYNCH_FF_NUMBER     : integer range 2 to 5 := 2         -- number of flip flops
    );
@@ -31,9 +31,11 @@ architecture behavioral of generic_reset_bridge is
 begin
 
    xilinx_rst_gen : if (VENDOR = "xilinx") generate
-      signal rst_ff                   : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0); -- flip flop chain for the reset signal before reset bridge
-      attribute ASYNC_REG             : string;
-      attribute ASYNC_REG  of rst_ff  : signal is "true";
+      signal rst_ff                  : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0); -- flip flop chain for the reset signal before reset bridge
+      attribute ASYNC_REG            : string;
+      attribute ASYNC_REG  of rst_ff : signal is "true";
+      attribute DONT_TOUCH           : string;
+      attribute DONT_TOUCH of rst_ff : signal is "TRUE";
    begin
    
       reset_bridge_p : process (reset_i, clock)
@@ -53,6 +55,8 @@ begin
       signal rst_ff                        : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0); -- flip flop chain for the reset signal before reset bridge
       attribute ALTERA_ATTRIBUTE           : string;
       attribute ALTERA_ATTRIBUTE of rst_ff : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
+      attribute PRESERVE                   : boolean;
+      attribute PRESERVE         of rst_ff : signal is true;
    begin
    
       reset_bridge_p : process (reset_i, clock)
