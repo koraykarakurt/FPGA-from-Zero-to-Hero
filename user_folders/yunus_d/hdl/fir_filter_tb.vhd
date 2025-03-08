@@ -1,35 +1,23 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.numeric_std.all;
+---------------------------------------------------------------------------------------------------
+-- Author : Yunus Dag	
+-- Description : Transposed FIR filter testbench
+--   
+--   
+--   
+-- More information (optional) :
+--    
+--    
+---------------------------------------------------------------------------------------------------
 
+library IEEE;
+use IEEE.std_logic_1164.all;
+use IEEE.numeric_std.all;
+use work.fir_filter_pkg.all;
 
 entity fir_filter_tb is
 end fir_filter_tb;
 
 architecture Behavioral of fir_filter_tb is
--- Constants
-constant clk_period       : time := 10 ns;
-constant NUMBER_OF_TAP    : integer := 5;
-constant COEFF_WIDTH      : natural := 18;
-constant INPUT_WIDTH      : natural := 25;
-constant OUTPUT_WIDTH     : natural := 48;
-
-
--- FIR Filter component
-component fir_filter_wrapper is
-generic(
-INPUT_WIDTH    : natural := 25;
-OUTPUT_WIDTH   : natural := 48
-);
-Port(
-clk         : in std_logic;
-rst         : in std_logic;
-valid_in    : in std_logic;
-data_in     : in std_logic_vector(INPUT_WIDTH-1 downto 0);
-data_out    : out std_logic_vector(OUTPUT_WIDTH-1 downto 0);
-valid_out   : out std_logic
-);
-end component;
 
 -- Signals
 signal clk       	: std_logic := '0';
@@ -45,36 +33,38 @@ begin
 clk_process: process
 begin
 	clk <= '0';
-	wait for clk_period / 2;
+	wait for CLK_PERIOD / 2;
 	clk <= '1';
-	wait for clk_period / 2;
+	wait for CLK_PERIOD / 2;
 end process;
 
 -- Process to Feed Inputs and Check Result
 process begin
 
 	rst <= '1';
-	wait for 2 * clk_period;
+	wait for 2 * CLK_PERIOD;
 	rst <= '0';
-	wait for 2 * clk_period;
+	wait for 2 * CLK_PERIOD;
 	
 	valid_in <= '1';
-	for i in 0 to NUMBER_OF_TAP -1 loop
+	for i in 0 to NUMBER_OF_TAPS -1 loop
 		data_in <= std_logic_vector(to_signed((i+1)*2, INPUT_WIDTH));
-		wait for clk_period;
+		wait for CLK_PERIOD;
 	end loop;
 	valid_in <= '0';
-	wait for 5 * clk_period;
+	wait for 5 * CLK_PERIOD;
 	report "Simulation Successful!" severity failure;
 	
 end process;
 
 -- Instantiate the FIR filter
-uut: fir_filter_wrapper
-generic map (
-	INPUT_WIDTH    => INPUT_WIDTH,
-	OUTPUT_WIDTH   => OUTPUT_WIDTH
-)
+uut: entity workfir_filter_wrapper
+   generic map (
+      INPUT_WIDTH    => INPUT_WIDTH,
+      OUTPUT_WIDTH   => OUTPUT_WIDTH,
+      COEFF_WIDTH    => COEFF_WIDTH,
+      NUMBER_OF_TAPS => NUMBER_OF_TAPS
+   )
 port map (
 	clk         => clk,
 	rst         => rst,
@@ -84,4 +74,4 @@ port map (
 	valid_out   => valid_out
 );
 
-end Behavioral;
+end behavioral;

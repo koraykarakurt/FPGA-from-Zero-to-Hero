@@ -1,9 +1,10 @@
 ---------------------------------------------------------------------------------------------------
 -- Author : Mustafa YETIS
 -- Description: Reset Synchronizer Bridge for Cross-Domain Reset Deassertion.
---					 Synchronizes reset deassertion to destination clock domain using
---              a chain of flip-flops. Supports Xilinx/Intel attributes for CDC.   
---   
+--				Synchronizes reset deassertion to destination clock domain using a chain of FFs.
+--          The module synchronizes the deassertion edge of rst_async (asynchronous reset) 
+--				to clk_dest, ensuring the reset release is glitch-free and 
+--				aligned with the destination clock.The Design Supports Xilinx/Intel attributes for CDC.      
 -- More information (optional) :
 -- 		Platform   : FPGA Vendor-Independent      
 ---------------------------------------------------------------------------------------------------
@@ -15,7 +16,7 @@ entity generic_reset_bridge is
   generic (
     VENDOR              : string		:= "Xilinx";	--FPGA vendor ("Xilinx", "Intel")
     RESET_ACTIVE_STATUS : std_logic	:= '1';			--Active level of reset ('0' or '1')
-    SYNCH_FF_NUMBER     : integer	:= 2				--Number of sync stages (default 2)
+    SYNCH_FF_NUMBER     : integer range 2 to 4	:= 2				--Number of sync stages (default 2)
   );
   port (
     clk_dest  : in  std_logic;	-- Destination clock
@@ -36,13 +37,13 @@ begin
   process(clk_dest, rst_async)
   begin
     if rst_async = RESET_ACTIVE_STATUS then
-      sync_chain <= (others => RESET_ACTIVE_STATUS);
+      sync_chain <= (others => RESET_ACTIVE_STATUS);--fill all FFs with RESET_ACTIVE_STATUS val
     elsif rising_edge(clk_dest) then
       sync_chain <= sync_chain(SYNCH_FF_NUMBER-2 downto 0) & not RESET_ACTIVE_STATUS;
     end if;
   end process;
 
-  rst_sync <= sync_chain(SYNCH_FF_NUMBER-1);
+  rst_sync <= sync_chain(SYNCH_FF_NUMBER-1);--MSB of shiftreg is directed as synch-rst-deassertion
 
   ------------------------------------------------------------------------------
   -- Vendor-Specific Metastability Attributes
