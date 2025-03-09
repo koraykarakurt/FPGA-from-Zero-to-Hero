@@ -25,7 +25,6 @@ entity generic_singlebit_cdc is
    );
     port ( 
       clk      : in std_logic;
-      rst      : in std_logic;
       data_in  : in std_logic;
       data_out : out std_logic
    );
@@ -39,26 +38,45 @@ begin
    xilinx_version: if (VENDOR = "xilinx") generate
       attribute async_reg : string;
       attribute async_reg of data_sync_buffer : signal is "true";
-      attribute shreg_extract : string; --???? be sure 
-      attribute shreg_extract of data_sync_buffer : signal is "no"; --???? be sure 
-      xilinx_rst_sync : process(clk)
+	  attribute DONT_TOUCH : string;
+      attribute DONT_TOUCH of data_sync_buffer : signal is "true";
+
+	  
+      xilinx_data_sync : process(clk)
       begin
          if (rising_edge(clk)) then
             data_sync_buffer <= data_sync_buffer(SYNCH_FF_NUMBER-2 downto 0) & data_in;
          end if;
-      end process xilinx_rst_sync;
+      end process xilinx_data_sync;
    end generate xilinx_version;
+   
+   
+   
+   intel_version : if (VENDOR = "intel") generate
+      attribute ALTERA_ATTRIBUTE                     : string;
+      attribute ALTERA_ATTRIBUTE of data_sync_buffer : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
+      attribute PRESERVE                             : boolean;
+      attribute PRESERVE of data_sync_buffer         : signal is true;
+
+      intel_data_sync : process(clk)
+      begin
+         if (rising_edge(clk)) then
+            data_sync_buffer <= data_sync_buffer(SYNCH_FF_NUMBER-2 downto 0) & data_in;
+         end if;
+      end process intel_data_sync;
+   end generate intel_version;   
+   
    
    efinix_version : if (VENDOR = "efinix") generate
       attribute async_reg: boolean;
       attribute async_reg of data_sync_buffer : signal is true;
 
-      efinix_rst_sync : process(clk)
+      efinix_data_sync : process(clk)
       begin
          if (rising_edge(clk)) then
             data_sync_buffer <= data_sync_buffer(SYNCH_FF_NUMBER-2 downto 0) & data_in;
          end if;
-      end process efinix_rst_sync;
+      end process efinix_data_sync;
    end generate efinix_version;
 
    data_out <= data_sync_buffer(SYNCH_FF_NUMBER-1);
