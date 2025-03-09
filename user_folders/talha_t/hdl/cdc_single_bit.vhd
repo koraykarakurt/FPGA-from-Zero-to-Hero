@@ -36,12 +36,10 @@ begin
 -- Xilinx attributes IOB, ASYNC_REG ve DONT_TOUCH
 -- Altera attributes USEIOOFF, PRESERVE, ALTERA_ATTRIBUTE (inline constraint)
    xilinx_version: if (VENDOR = "xilinx") generate
-      attribute async_reg : string;
-      attribute async_reg of data_sync_buffer : signal is "true";
-	  attribute DONT_TOUCH : string;
+      attribute ASYNC_REG : string;
+      attribute ASYNC_REG of data_sync_buffer : signal is "true";
+      attribute DONT_TOUCH : string;
       attribute DONT_TOUCH of data_sync_buffer : signal is "true";
-
-	  
       xilinx_data_sync : process(clk)
       begin
          if (rising_edge(clk)) then
@@ -49,9 +47,7 @@ begin
          end if;
       end process xilinx_data_sync;
    end generate xilinx_version;
-   
-   
-   
+
    intel_version : if (VENDOR = "intel") generate
       attribute ALTERA_ATTRIBUTE                     : string;
       attribute ALTERA_ATTRIBUTE of data_sync_buffer : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
@@ -66,11 +62,9 @@ begin
       end process intel_data_sync;
    end generate intel_version;   
    
-   
    efinix_version : if (VENDOR = "efinix") generate
-      attribute async_reg: boolean;
-      attribute async_reg of data_sync_buffer : signal is true;
-
+      attribute ASYNC_REG: boolean;
+      attribute ASYNC_REG of data_sync_buffer : signal is true;
       efinix_data_sync : process(clk)
       begin
          if (rising_edge(clk)) then
