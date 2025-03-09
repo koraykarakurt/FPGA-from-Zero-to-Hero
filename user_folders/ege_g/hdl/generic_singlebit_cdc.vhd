@@ -9,7 +9,7 @@ use IEEE.std_logic_1164.all;
 
 entity generic_singlebit_cdc is
 generic(
-   SYNCH_FF_NUMBER      : integer   := 4; --can change with respect to clock speed
+   SYNCH_FF_NUMBER      : integer range 2 to 8 := 4; --can change with respect to clock speed
    VENDOR               : string    := "XILINX"
 );
 port(
@@ -25,7 +25,9 @@ begin
 GEN_XILINX: if VENDOR = "XILINX" generate
 signal ff_chain : std_logic_vector (SYNCH_FF_NUMBER-1 downto 0) := (others => '0');
 attribute ASYNC_REG : string;
+attribute DONT_TOUCH : string;
 attribute ASYNC_REG of ff_chain : signal is "TRUE";
+attribute DONT_TOUCH of sync_reg : signal is "TRUE";
 begin
    process(clk) begin
       if rising_edge(clk) then
@@ -39,8 +41,10 @@ begin
 end generate GEN_XILINX;
 
 GEN_ALTERA: if VENDOR = "ALTERA" generate
---Quartus specific attributes will go here
 signal ff_chain : std_logic_vector (SYNCH_FF_NUMBER-1 downto 0) := (others => '0');
+attribute PRESERVE : boolean;
+attribute PRESERVE of ff_chain : signal is true;
+
 begin
    process(clk) begin
       if rising_edge(clk) then

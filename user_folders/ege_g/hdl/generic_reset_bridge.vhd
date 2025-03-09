@@ -12,7 +12,7 @@ use IEEE.std_logic_1164.all;
 entity generic_reset_bridge is
 generic(
    RESET_ACTIVE_STATUS  : std_logic := '0'; -- 0 is active low, 1 is active high
-   SYNCH_FF_NUMBER      : integer   := 4; --can change with respect to clock speed
+   SYNCH_FF_NUMBER      : integer range 2 to 8 := 4; --can change with respect to clock speed
    VENDOR               : string    := "XILINX"
 );
 port(
@@ -30,7 +30,9 @@ begin
 GEN_XILINX: if VENDOR = "XILINX" generate
 signal ff_chain : std_logic_vector (SYNCH_FF_NUMBER-1 downto 0) := (others => RESET_ACTIVE_STATUS);
 attribute ASYNC_REG : string;
+attribute DONT_TOUCH : string;
 attribute ASYNC_REG of ff_chain : signal is "TRUE";
+attribute DONT_TOUCH of sync_reg : signal is "TRUE";
 begin
    process(clk, rst) begin
       if (rst = RESET_ACTIVE_STATUS) then
@@ -47,7 +49,9 @@ end generate GEN_XILINX;
 
 GEN_ALTERA: if VENDOR = "ALTERA" generate
 signal ff_chain : std_logic_vector (SYNCH_FF_NUMBER-1 downto 0) := (others => RESET_ACTIVE_STATUS);
---Quartus specific attributes will go here
+attribute PRESERVE : boolean;
+attribute PRESERVE of ff_chain : signal is true;
+
 begin
    process(clk, rst) begin
       if (rst = RESET_ACTIVE_STATUS) then
