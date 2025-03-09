@@ -51,13 +51,19 @@ begin
   -- Intel : Identify synchronizer for Quartus
   ------------------------------------------------------------------------------
   gen_xilinx_attr : if VENDOR = "Xilinx" generate
-    attribute async_reg : string;
-    attribute async_reg of sync_chain : signal is "true";
+    -- Xilinx: ASYNC_REG for placement, DONT_TOUCH to prevent optimization
+    attribute async_reg    : string;
+    attribute dont_touch   : string;
+    attribute async_reg    of sync_chain : signal is "true";
+    attribute dont_touch   of sync_chain : signal is "true";
   end generate;
 
   gen_intel_attr : if VENDOR = "Intel" generate
+    -- Intel: PRESERVE to retain registers, ALTERA_ATTRIBUTE for synchronization
+    attribute preserve         : boolean;
     attribute altera_attribute : string;
-    attribute altera_attribute of sync_chain : signal is
+    attribute preserve         of sync_chain : signal is true;
+    attribute altera_attribute of sync_chain : signal is 
       "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
   end generate;
 
