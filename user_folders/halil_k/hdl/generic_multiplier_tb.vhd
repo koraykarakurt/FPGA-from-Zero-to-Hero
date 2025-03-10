@@ -8,6 +8,11 @@
 --                  * Unsigned: Random numbers between 0 and 2^MULT_LEN-1
 --                - Verifies multiplication results against expected values
 --                - Reports detailed test results for each iteration
+--                - Includes error injection capability to demonstrate error detection:
+--                  * Can inject errors at specified test iteration
+--                  * Supports error injection for both signed and unsigned multiplication
+--                  * Uses XOR operation to corrupt multiplication results
+--                - Provides comprehensive test summary with error reporting
 ---------------------------------------------------------------------------------------------------
 library IEEE;
 use IEEE.std_logic_1164.all;
@@ -19,17 +24,15 @@ end generic_multiplier_tb;
 
 architecture behavioral of generic_multiplier_tb is
     -- Constants
-    constant MULT_LEN      : integer := 16; -- Multiplier length
-    constant CLK_PERIOD    : time := 10 ns; -- Clock period
-    constant NUM_TESTS     : integer := 100; -- Number of test iterations
-
-
+    constant MULT_LEN      : integer := 16; -- Multiplier length 
+    constant CLK_PERIOD    : time := 10 ns; -- Clock period 
+    constant NUM_TESTS     : integer := 100; -- Number of test iterations 
    
-    -- Component declaration for generic_multiplier
+    -- Component declaration for generic_multiplier 
     component generic_multiplier is
         Generic (    
             MULT_TYPE : boolean := true; -- Signed multiplier
-            MULT_LEN  : integer range 2 to 64 := 16     -- Multiplier length
+            MULT_LEN  : integer range 2 to 64 := 16     -- Multiplier length 
         );
         Port (    
             mult_in_1 : in std_logic_vector(MULT_LEN-1 downto 0); -- Input 1
@@ -126,28 +129,14 @@ begin
         mult_out  => u_mult_out  -- Output
     );
     
-    -- Error injection process
-    error_injection: process(s_mult_out, u_mult_out)
-        variable corrupted_value : std_logic_vector(2*MULT_LEN-1 downto 0);
-    begin
-        if error_inject_enable and test_number = error_inject_test then
-            if error_inject_type = 0 then
-                -- Corrupt signed multiplication result
-                corrupted_value := s_mult_out xor error_inject_value;
-                s_expected_out <= corrupted_value;
-            else
-                -- Corrupt unsigned multiplication result
-                corrupted_value := u_mult_out xor error_inject_value;
-                u_expected_out <= corrupted_value;
-            end if;
-        end if;
-    end process error_injection;
-    
     -- Stimulus process
     stimulus: process
         -- Variables for expected results calculation
         variable v_s_expected : std_logic_vector(2*MULT_LEN-1 downto 0); -- Signed expected output
         variable v_u_expected : std_logic_vector(2*MULT_LEN-1 downto 0); -- Unsigned expected output
+        variable v_error_msg : string(1 to 18); -- Error message variable
+        variable v_mult_type : string(1 to 8); -- Multiplication type variable
+        variable corrupted_value : std_logic_vector(2*MULT_LEN-1 downto 0); -- For error injection
     begin
         -- Initialize signals
         s_mult_in_1 <= (others => '0'); -- Input 1
@@ -157,7 +146,7 @@ begin
         
         -- Enable error injection for test demonstration
         error_inject_enable <= true;  -- Enable error injection
-        error_inject_test <= 50;      -- Inject error in test #50
+        error_inject_test <= 10;      -- Inject error in test #50
         error_inject_type <= 0;       -- Inject error in signed multiplication
 
         wait for CLK_PERIOD * 2;  -- Wait for initial stabilization
@@ -179,29 +168,56 @@ begin
             v_s_expected := std_logic_vector(signed(s_mult_in_1) * signed(s_mult_in_2));
             v_u_expected := std_logic_vector(unsigned(u_mult_in_1) * unsigned(u_mult_in_2));
             
-            -- Assign expected values to signals (if no error injection)
-            if not (error_inject_enable and test_number = error_inject_test) then
-                s_expected_out <= v_s_expected;
-                u_expected_out <= v_u_expected;
+            -- Apply error injection if needed
+            if error_inject_enable and i = error_inject_test then
+                report "Error injection triggered for test #" & integer'image(i) &
+                       " Type: " & integer'image(error_inject_type) severity note;
+                       
+                if error_inject_type = 0 then
+                    -- Inject error in signed multiplication
+                    corrupted_value := v_s_expected;  -- Copy expected value
+                    corrupted_value(MULT_LEN-1 downto 0) := not corrupted_value(MULT_LEN-1 downto 0);  -- Invert specific bits
+                    v_s_expected := corrupted_value;  -- Update expected value
+                    report "Injecting error in signed multiplication" severity note;
+                else
+                    -- Inject error in unsigned multiplication
+                    corrupted_value := v_u_expected;  -- Copy expected value
+                    corrupted_value(MULT_LEN-1 downto 0) := not corrupted_value(MULT_LEN-1 downto 0);  -- Invert specific bits
+                    v_u_expected := corrupted_value;  -- Update expected value
+                    report "Injecting error in unsigned multiplication" severity note;
+                end if;
             end if;
             
+            -- Assign expected values to signals
+            s_expected_out <= v_s_expected;
+            u_expected_out <= v_u_expected;
             
-            -- Wait for multiplier outputs to stabilize
-            wait for CLK_PERIOD/2;
+            -- Wait for outputs to stabilize
+            wait for CLK_PERIOD/10;
+            
+            -- Set error message based on condition for signed test
+            if error_inject_enable and i = error_inject_test and error_inject_type = 0 then
+                v_error_msg := " (Error Injected) ";
+            else
+                v_error_msg := "                  ";
+            end if;
             
             -- Report current test values with error injection status
-            report "Test #" & integer'image(i) & 
-                  (if error_inject_enable and test_number = error_inject_test and error_inject_type = 0 
-                   then " (Error Injected) " else " ") &
+            report "Test #" & integer'image(i) & v_error_msg &
                   "Signed: " & integer'image(to_integer(signed(s_mult_in_1))) & " * " & 
                   integer'image(to_integer(signed(s_mult_in_2))) & " = " &
                   integer'image(to_integer(signed(s_mult_out))) &
                   ", Expected: " & integer'image(to_integer(signed(v_s_expected)))
             severity note;
             
-            report "Test #" & integer'image(i) & 
-                  (if error_inject_enable and test_number = error_inject_test and error_inject_type = 1 
-                   then " (Error Injected) " else " ") &
+            -- Set error message for unsigned test
+            if error_inject_enable and i = error_inject_test and error_inject_type = 1 then
+                v_error_msg := " (Error Injected) ";
+            else
+                v_error_msg := "                  ";
+            end if;
+            
+            report "Test #" & integer'image(i) & v_error_msg &
                   "Unsigned: " & integer'image(to_integer(unsigned(u_mult_in_1))) & " * " & 
                   integer'image(to_integer(unsigned(u_mult_in_2))) & " = " &
                   integer'image(to_integer(unsigned(u_mult_out))) &
@@ -209,14 +225,14 @@ begin
             severity note;
             
             -- Signed multiplication check
-            if s_mult_out /= v_s_expected and not (error_inject_enable and test_number = error_inject_test and error_inject_type = 0) then
+            if s_mult_out /= s_expected_out and not (error_inject_enable and i = error_inject_test and error_inject_type = 0) then
                 report "Test #" & integer'image(i) & ": Signed multiplication error"
                 severity error;
                 error_count <= error_count + 1;
             end if;                
 
             -- Unsigned multiplication check
-            if u_mult_out /= v_u_expected and not (error_inject_enable and test_number = error_inject_test and error_inject_type = 1) then
+            if u_mult_out /= u_expected_out and not (error_inject_enable and i = error_inject_test and error_inject_type = 1) then
                 report "Test #" & integer'image(i) & ": Unsigned multiplication error"
                 severity error;
                 error_count <= error_count + 1;
@@ -231,9 +247,16 @@ begin
         
         if error_count = 0 then
             if error_inject_enable then
+                -- Set multiplication type string
+                if error_inject_type = 0 then
+                    v_mult_type := "signed  ";
+                else
+                    v_mult_type := "unsigned";
+                end if;
+                
                 report "All tests completed. Error was successfully injected in test #" & 
                       integer'image(error_inject_test) & " for " & 
-                      (if error_inject_type = 0 then "signed" else "unsigned") & " multiplication."
+                      v_mult_type & " multiplication."
                     severity note;
             else
                 report "All " & integer'image(NUM_TESTS) & " test iterations completed successfully!"
