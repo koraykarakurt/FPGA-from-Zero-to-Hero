@@ -175,15 +175,17 @@ begin
                   
             if error_inject_type = 0 then
                -- Inject error in signed multiplication
-               corrupted_value := v_s_expected;                                        -- Copy expected value
-               corrupted_value(MULT_LEN-1 downto 0) := not corrupted_value(MULT_LEN-1 downto 0);  -- Invert specific bits
-               v_s_expected := corrupted_value;                                        -- Update expected value
+               corrupted_value := v_s_expected;
+               -- Invert specific bits
+               corrupted_value(MULT_LEN-1 downto 0) := not corrupted_value(MULT_LEN-1 downto 0);
+               v_s_expected := corrupted_value;
                report "Injecting error in signed multiplication" severity note;
             else
                -- Inject error in unsigned multiplication
-               corrupted_value := v_u_expected;                                        -- Copy expected value
-               corrupted_value(MULT_LEN-1 downto 0) := not corrupted_value(MULT_LEN-1 downto 0);  -- Invert specific bits
-               v_u_expected := corrupted_value;                                        -- Update expected value
+               corrupted_value := v_u_expected;
+               -- Invert specific bits
+               corrupted_value(MULT_LEN-1 downto 0) := not corrupted_value(MULT_LEN-1 downto 0);
+               v_u_expected := corrupted_value;
                report "Injecting error in unsigned multiplication" severity note;
             end if;
          end if;
@@ -204,9 +206,9 @@ begin
          
          -- Report current test values with error injection status
          report "Test #" & integer'image(i) & v_error_msg &
-               "Signed: " & integer'image(to_integer(signed(s_mult_in_1))) & " * " & 
-               integer'image(to_integer(signed(s_mult_in_2))) & " = " &
-               integer'image(to_integer(signed(s_mult_out))) &
+               "Signed: " & integer'image(to_integer(signed(s_mult_in_1))) & 
+               " * " & integer'image(to_integer(signed(s_mult_in_2))) & 
+               " = " & integer'image(to_integer(signed(s_mult_out))) &
                ", Expected: " & integer'image(to_integer(signed(v_s_expected)))
          severity note;
          
@@ -218,21 +220,23 @@ begin
          end if;
          
          report "Test #" & integer'image(i) & v_error_msg &
-               "Unsigned: " & integer'image(to_integer(unsigned(u_mult_in_1))) & " * " & 
-               integer'image(to_integer(unsigned(u_mult_in_2))) & " = " &
-               integer'image(to_integer(unsigned(u_mult_out))) &
+               "Unsigned: " & integer'image(to_integer(unsigned(u_mult_in_1))) & 
+               " * " & integer'image(to_integer(unsigned(u_mult_in_2))) & 
+               " = " & integer'image(to_integer(unsigned(u_mult_out))) &
                ", Expected: " & integer'image(to_integer(unsigned(v_u_expected)))
          severity note;
          
          -- Signed multiplication check
-         if s_mult_out /= s_expected_out and not (error_inject_enable and i = error_inject_test and error_inject_type = 0) then
+         if s_mult_out /= s_expected_out and 
+            not (error_inject_enable and i = error_inject_test and error_inject_type = 0) then
             report "Test #" & integer'image(i) & ": Signed multiplication error"
             severity error;
             error_count <= error_count + 1;
          end if;                
 
          -- Unsigned multiplication check
-         if u_mult_out /= u_expected_out and not (error_inject_enable and i = error_inject_test and error_inject_type = 1) then
+         if u_mult_out /= u_expected_out and 
+            not (error_inject_enable and i = error_inject_test and error_inject_type = 1) then
             report "Test #" & integer'image(i) & ": Unsigned multiplication error"
             severity error;
             error_count <= error_count + 1;
@@ -242,7 +246,7 @@ begin
       end loop;
       
       -- Report test completion with error injection status
-      test_done <= true;                 -- Test done
+      test_done <= true;
       wait for CLK_PERIOD;
       
       if error_count = 0 then
@@ -255,17 +259,17 @@ begin
             end if;
             
             report "All tests completed. Error was successfully injected in test #" & 
-                  integer'image(error_inject_test) & " for " & 
-                  v_mult_type & " multiplication."
-               severity note;
+                  integer'image(error_inject_test) & " for " & v_mult_type & " multiplication."
+            severity note;
          else
             report "All " & integer'image(NUM_TESTS) & " test iterations completed successfully!"
-               severity note;
+            severity note;
          end if;
       else
-         report "Test completed with " & integer'image(error_count) & " unexpected errors out of " & 
-               integer'image(NUM_TESTS * 2) & " total multiplications."
-            severity error;
+         report "Test completed with " & integer'image(error_count) & 
+               " unexpected errors out of " & integer'image(NUM_TESTS * 2) & 
+               " total multiplications."
+         severity error;
       end if;
          
       wait;
