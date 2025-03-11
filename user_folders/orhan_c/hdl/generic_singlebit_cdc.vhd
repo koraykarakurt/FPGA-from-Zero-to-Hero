@@ -22,25 +22,12 @@ entity generic_singlebit_cdc is
    port 
    (
 	   clk_dest		   : in std_logic; -- Destination clock domain
-	   async_data_i   : in std_logic; -- Async input signal	
-      sync_data_o    : out std_logic -- Sync output signal	 
+	   async_data   : in std_logic; -- Async input signal	
+      sync_data    : out std_logic -- Sync output signal	 
    );
 end generic_singlebit_cdc;
 
 architecture behavioral of generic_singlebit_cdc is
-   
-   --attributes for altera
-   attribute USEIOOFF                                : string ;				 --Disable I/O buffers
-   attribute USEIOOFF of async_data_i                : signal is "ON"; 	    --Enable async_data_i ports I/O buffers
-   
-   attribute ALTERA_ATTRIBUTE                        : string ;
-   attribute ALTERA_ATTRIBUTE of async_data_i        : signal is            --async data input is not included the timing analysis 	 
-   "-name SDC_STATEMENT ""set_false_path -from [get_ports {async_data_i}] -to [all_registers]"""; 
-   
-   
-   --attribute for xilinx
-   attribute IOB                                     : string;
-   attribute IOB of async_data_i 	                 : signal is "TRUE";    --Forces async_data_i into I/O Block
    
 begin
    -- Intel FPGA-specific implementation
@@ -54,6 +41,9 @@ begin
      attribute SYNCHRONIZER_IDENTIFICATION             : string ;
      attribute PRESERVE of data_reg                    : signal is TRUE;       --data_reg protect during synthesize
      attribute SYNCHRONIZER_IDENTIFICATION of data_reg : signal is "FORCED";
+     attribute ALTERA_ATTRIBUTE                        : string ;
+     attribute ALTERA_ATTRIBUTE of data_reg            : signal is            --async data input is not included the timing analysis 	 
+     "-name SDC_STATEMENT ""set_false_path -from [get_pins {data_reg[0]}] -to [all_registers]"""; 
 
    begin
       
@@ -62,20 +52,10 @@ begin
       process (clk_dest)
       begin
 	     if rising_edge(clk_dest) then
-		        
-			data_reg(0) <= async_data_i;
-			
-			for i in 1 to SYNCH_FF_NUMBER - 1 loop
-				
-				data_reg(i) <= data_reg(i-1);
-		
-			end loop;
-		
+           data_reg <= data_reg(data_reg'left-1 downto 0) & async_data;
 		 end if;
 	  end process;
-      
-	  sync_data_o <= data_reg(SYNCH_FF_NUMBER - 1);
-   
+     sync_data <= data_reg(data_reg'left);
    end generate intel_cdc;
 	
 
@@ -98,20 +78,9 @@ begin
       process (clk_dest)
       begin
 		 if rising_edge(clk_dest) then
-		        
-			data_reg(0) <= async_data_i;
-			
-			for i in 1 to SYNCH_FF_NUMBER - 1 loop
-				
-				data_reg(i) <= data_reg(i-1);
-		
-			end loop;
-		
+          data_reg <= data_reg(data_reg'left-1 downto 0) & async_data;
 		 end if;
       end process;
-      
-	  sync_data_o <= data_reg(SYNCH_FF_NUMBER - 1);
-		 
+	  sync_data <= data_reg(data_reg'left);
    end generate xilinx_cdc;
-
 end behavioral;
