@@ -21,7 +21,7 @@ use IEEE.STD_LOGIC_1164.all;
 
 entity async_reset_synchronizer is
     generic (
-        VENDOR              : string               := "GOWIN"; -- "xilinx", "intel", "GOWIN"
+        VENDOR              : string               := "GOWIN"; -- "XILINX", "ALTERA", "GOWIN"
         RESET_ACTIVE_STATUS : std_logic            := '1';      -- '0': active low, '1': active high
         ASYNCH_FF_NUMBER     : natural range 2 to 5 := 2         
     );
@@ -39,7 +39,7 @@ architecture behavioral of async_reset_synchronizer is
 begin
 
     -- Xilinx-specific implementation
-    xilinx_impl : if VENDOR = "xilinx" generate
+    xilinx_impl : if VENDOR = "XILINX" generate
         attribute async_reg                     : string;
         attribute async_reg of async_chain        : signal is "true";
         attribute shreg_extract                  : string;
