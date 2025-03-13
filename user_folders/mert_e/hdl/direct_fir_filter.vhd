@@ -19,6 +19,8 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 use work.fir_filter_coeffs.all;
 
+
+
 entity direct_fir_filter is
    generic (
       number_of_taps        : integer := 4; 
@@ -34,6 +36,8 @@ entity direct_fir_filter is
       data_out              : out std_logic_vector(output_width-1 downto 0);
       valid_out             : out std_logic
    );
+   attribute syn_dspstyle: string;
+   attribute syn_dspstyle of result: signal is "logic";
 end direct_fir_filter;
 
 architecture behavioral of direct_fir_filter is
@@ -67,37 +71,29 @@ begin
                 valid_pipe          <= (others => '0');
                 valid_out           <= '0';
             elsif valid_in = '1' then
-            
-                variable i : integer := number_of_taps-1;
-                while i > 0 loop
-                    data_pipe(i) <= data_pipe(i-1);
-                    i := i - 1;
+                -- Data pipeline shifting
+                for idx in number_of_taps-1 downto 1 loop
+                    data_pipe(idx) <= data_pipe(idx-1);
                 end loop;
                 data_pipe(0) <= signed(data_in);
-
-                -- Performing multiplications and accumulations
-                i := 0;
-                while i < number_of_taps loop
-                    product_pipe(i) <= data_pipe(i) * coeff_pipe(i);
-                    if i = 0 then
-                        sum_pipe(i) <= resize(product_pipe(i), output_width);
+                -- Performing multiplications
+                for idx in 0 to number_of_taps-1 loop
+                    product_pipe(idx) <= data_pipe(idx) * coeff_pipe(idx);
+                    if idx = 0 then
+                        sum_pipe(idx) <= resize(product_pipe(idx), output_width);
                     else
-                        sum_pipe(i) <= sum_pipe(i-1) + resize(product_pipe(i), output_width);
+                        sum_pipe(idx) <= sum_pipe(idx-1) + resize(product_pipe(idx), output_width);
                     end if;
-                    i := i + 1;
                 end loop;
-
+                -- Valid pipeline shifting
                 valid_pipe(0) <= valid_in;
-                i := 1;
-                while i < number_of_taps loop
-                    valid_pipe(i) <= valid_pipe(i-1);
-                    i := i + 1;
+                for idx in 1 to number_of_taps-1 loop
+                    valid_pipe(idx) <= valid_pipe(idx-1);
                 end loop;
                 valid_out <= valid_pipe(number_of_taps-1);
             end if;
         end if;
     end process;
-    
     data_out <= std_logic_vector(sum_pipe(number_of_taps-1));
 
 end behavioral;
