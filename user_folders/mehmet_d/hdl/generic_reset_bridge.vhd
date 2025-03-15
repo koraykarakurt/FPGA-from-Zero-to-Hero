@@ -77,6 +77,8 @@ begin
       attribute SYN_KEEP of rst_reg     : signal is true;
       attribute SYN_PRESERVE            : boolean;
       attribute SYN_PRESERVE of rst_reg : signal is true;
+      attribute ALSPRESERVE             : boolean;
+      attribute ALSPRESERVE of rst_reg  : signal is true;
    begin
       microchip : process (clk, rst_in)
       begin
