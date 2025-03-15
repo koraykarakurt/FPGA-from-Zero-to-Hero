@@ -32,7 +32,7 @@ signal ff_chain : std_logic_vector (SYNCH_FF_NUMBER-1 downto 0) := (others => RE
 attribute ASYNC_REG : string;
 attribute DONT_TOUCH : string;
 attribute ASYNC_REG of ff_chain : signal is "TRUE";
-attribute DONT_TOUCH of sync_reg : signal is "TRUE";
+attribute DONT_TOUCH of ff_chain : signal is "TRUE";
 begin
    process(clk, rst) begin
       if (rst = RESET_ACTIVE_STATUS) then
