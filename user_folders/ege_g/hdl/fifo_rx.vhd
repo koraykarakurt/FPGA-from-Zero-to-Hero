@@ -36,6 +36,7 @@ signal read_ptr		: integer range 0 to FIFO_LENGTH-1 := 0;
 signal fifo_count    : integer range 0 to FIFO_LENGTH   := 0;
 signal full_int		: std_logic := '0';
 signal empty_int	   : std_logic := '1';
+signal data_int      : std_logic_vector (DATA_LENGTH-1 downto 0);
 
 begin
 process(clk) begin
@@ -44,7 +45,7 @@ process(clk) begin
 			write_ptr 	<= 0;
 			read_ptr 	<= 0;
          fifo_count  <= 0;
-         data_out    <= (others => '0');
+         data_int    <= (others => '0');
 		else				
          --fifo counter (capacity)
          if (write_en = '1' and read_en = '1') then
@@ -73,7 +74,7 @@ process(clk) begin
          --read operation
 			if (read_en = '1' and empty_int = '0') then
 				read_ptr    <= (read_ptr + 1) mod FIFO_LENGTH;
-            data_out    <= fifo_buffer(read_ptr);
+            data_int    <= fifo_buffer(read_ptr);
 			end if;
 		end if;
 	end if;
@@ -92,7 +93,11 @@ process(fifo_count) begin
    end if;
 end process;
 
-full 	<= full_int;
-empty <= empty_int;
-
+process(clk) begin
+   if rising_edge(clk) then
+      full 	   <= full_int;
+      empty    <= empty_int;
+      data_out <= data_int;
+   end if;
+end process;
 end logic;

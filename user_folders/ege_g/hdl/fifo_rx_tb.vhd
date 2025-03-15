@@ -112,11 +112,12 @@ begin
 	wait until rst = '0';
 	wait for 5*CLK_PERIOD; --wait a little bit
 	read_en 	<= '1';
-	wait until rising_edge(clk);
+   wait until rising_edge(clk);
+   wait until rising_edge(clk);
 	for i in 1 to FIFO_LENGTH loop
-		expected := std_logic_vector(to_unsigned(i,DATA_LENGTH));
 		wait until rising_edge(clk);
-		check(expected, data_out, error_v);
+      expected := std_logic_vector(to_unsigned(i,DATA_LENGTH));
+		check(expected, data_out, error_v);     
 	end loop;
 	error_R <= error_v;
 	read_en <= '0';
