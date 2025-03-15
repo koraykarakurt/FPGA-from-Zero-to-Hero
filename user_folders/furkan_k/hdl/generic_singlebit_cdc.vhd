@@ -51,7 +51,7 @@ begin
    altera_sb_cdc_gen : if (VENDOR = "altera") generate
       signal data_ff                        : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others => '0'); -- flip flop chain for the single bit cdc 
       attribute ALTERA_ATTRIBUTE            : string;
-      attribute ALTERA_ATTRIBUTE of data_ff : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
+      attribute ALTERA_ATTRIBUTE of data_ff : signal is "-name SDC_STATEMENT ""set_false_path -from [get_pins {adata_i}] -to [get_registers {data_ff["& integer'image(SYNCH_FF_NUMBER-1)&"]} ]""";    
       attribute PRESERVE                    : boolean;
       attribute PRESERVE         of data_ff : signal is true;
    begin
@@ -66,5 +66,7 @@ begin
       sdata_o       <= data_ff(0);      
    
    end generate altera_sb_cdc_gen;
+
+
 
 end behavioral;

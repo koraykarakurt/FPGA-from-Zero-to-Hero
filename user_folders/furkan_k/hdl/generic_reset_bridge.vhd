@@ -31,11 +31,11 @@ architecture behavioral of generic_reset_bridge is
 begin
 
    xilinx_rst_gen : if (VENDOR = "xilinx") generate
-      signal rst_ff                  : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0); -- flip flop chain for the reset signal before reset bridge
+      signal rst_ff                  : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS); -- flip flop chain for the reset signal before reset bridge
       attribute ASYNC_REG            : string;
       attribute ASYNC_REG  of rst_ff : signal is "true";
       attribute DONT_TOUCH           : string;
-      attribute DONT_TOUCH of rst_ff : signal is "TRUE";
+      attribute DONT_TOUCH of rst_ff : signal is "true";
    begin
    
       reset_bridge_p : process (reset_i, clock)
@@ -52,9 +52,9 @@ begin
    end generate xilinx_rst_gen;
    
    altera_rst_gen : if (VENDOR = "altera") generate
-      signal rst_ff                        : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0); -- flip flop chain for the reset signal before reset bridge
+      signal rst_ff                        : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS); -- flip flop chain for the reset signal before reset bridge
       attribute ALTERA_ATTRIBUTE           : string;
-      attribute ALTERA_ATTRIBUTE of rst_ff : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
+      attribute ALTERA_ATTRIBUTE of rst_ff : signal is "-name SDC_STATEMENT ""set_false_path -from [get_pins {reset_i}] -to [get_registers{ rst_ff["& integer'image(SYNCH_FF_NUMBER-1)&"] }]""";
       attribute PRESERVE                   : boolean;
       attribute PRESERVE         of rst_ff : signal is true;
    begin
