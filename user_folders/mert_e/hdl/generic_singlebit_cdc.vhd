@@ -81,9 +81,8 @@ begin
 
     -- Generic implementation for GOWIN vendor
     gowin_gen : if VENDOR = "GOWIN" generate
-        attribute MULTALU18X18_MODE                : integer;
-        attribute MULTALU18X18_MODE of Sync_Reg    : signal is 1;
-        attribute 
+        attribute SYN_PRESERVE : integer;
+        attribute SYN_PRESERVE of Synch_Reg : signal is 1;
     begin
         other_sync : process (fast_Clk, rst)
         begin

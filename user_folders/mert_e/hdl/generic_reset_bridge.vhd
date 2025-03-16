@@ -40,10 +40,10 @@ begin
 
     -- Xilinx-specific implementation
     xilinx_impl : if VENDOR = "XILINX" generate
-        attribute async_reg                     : string;
-        attribute async_reg of async_chain        : signal is "true";
-        attribute shreg_extract                  : string;
-        attribute shreg_extract of async_chain    : signal is "no";
+        attribute ASYNC_REG                 : string;
+        attribute ASYNC_REG  of Sync_Reg      : signal is "true";
+        attribute DONT_TOUCH             : string;
+        attribute DONT_TOUCH of Sync_Reg  : signal is "no";
     begin
         proc_xilinx_sync : process (clk, rst_in)
         begin
@@ -58,27 +58,30 @@ begin
     end generate xilinx_impl;
 
     -- Intel-specific implementation
-    intel_impl : if VENDOR = "intel" generate
-        attribute altera_attribute of async_chain : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
-        attribute dont_merge                     : boolean;
-        attribute dont_merge of async_chain        : signal is true;
-        attribute preserve                       : boolean;
-        attribute preserve of async_chain          : signal is true;
+    altera_impl : if VENDOR = "ALTERA" generate
+        attribute ALTERA_ATTRIBUTE             : boolean;
+        attribute ALTERA_ATTRIBUTE of Sync_Reg : signal is true;
+        attribute DONT_MERGE                   : boolean;
+        attribute DONT_MERGE of Sync_Reg       : signal is true;
+        attribute PRESERVE                     : boolean;
+        attribute PRESERVE of Sync_Reg         : signal is true;
     begin
-        proc_intel_sync : process (clk, rst_in)
+        proc_altera_sync : process (clk, rst_in)
         begin
             if rst_in = RESET_ACTIVE_STATUS then
                 async_chain <= (others => RESET_ACTIVE_STATUS);
             elsif rising_edge(clk) then
                 async_chain <= async_chain(SYNCH_FF_NUMBER-2 downto 0) & (not RESET_ACTIVE_STATUS);
             end if;
-        end process proc_intel_sync;
+        end process proc_altera_sync;
 
         rst_out <= async_chain(SYNCH_FF_NUMBER-1);
     end generate intel_impl;
 
     -- GOWIN-specific implementation
     gowin_impl : if VENDOR = "GOWIN" generate
+        attribute SYN_PRESERVE : integer;
+        attribute SYN_PRESERVE of Synch_Reg : signal is 1;
     begin
         proc_gowin_sync : process (clk, rst_in)
         begin
