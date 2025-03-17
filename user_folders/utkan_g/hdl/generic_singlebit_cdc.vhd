@@ -24,8 +24,8 @@ use IEEE.numeric_std.all;
 
 entity generic_singlebit_cdc is
    generic (
-      VENDOR              : string               := "XILINX";
-      SYNC_FF_NUMBER      : integer range 2 to 5 := 2
+      VENDOR              : string               := "XILINX"; -- Only Xilinx and Altera are supported
+      SYNC_FF_NUMBER      : integer range 2 to 5 := 2 -- Number of flip-flops
    );
    port (
       clk                 : in  std_logic; -- Destination clock
@@ -58,7 +58,9 @@ begin
       signal sync_reg : std_logic_vector(SYNC_FF_NUMBER - 1 downto 0) := (others => '0'); -- Synchronized register
       -- Inline constraints
       attribute ALTERA_ATTRIBUTE             : string;
-      attribute ALTERA_ATTRIBUTE of sync_reg : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
+      attribute ALTERA_ATTRIBUTE of sync_reg : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS"" " &
+                                                "-name SDC_STATEMENT ""set_false_path -from [get_pins {data_i}] -to [get_registers {sync_reg[" & 
+                                                integer'image(SYNC_FF_NUMBER-1) & "]}]""";
       attribute PRESERVE                     : boolean;
       attribute PRESERVE of sync_reg         : signal is true;
    begin
@@ -70,10 +72,6 @@ begin
       end process;
       data_o <= sync_reg(SYNC_FF_NUMBER - 1);
    end generate gen_altera;
-
-   gen_unsupported : if (VENDOR /= "XILINX" and VENDOR /= "ALTERA") generate
-      data_o <= '0';
-   end generate gen_unsupported;
 
    -- Simulation assertions (Assertions are not compatible with synthesis, so we use synthesis translate_off/on)
    -- synthesis translate_off

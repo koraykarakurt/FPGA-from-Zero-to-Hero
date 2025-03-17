@@ -23,7 +23,7 @@ use IEEE.numeric_std.all;
 
 entity generic_reset_bridge is
    generic (
-      VENDOR              : string               := "XILINX";
+      VENDOR              : string               := "XILINX"; -- Only Xilinx and Altera are supported
       SYNC_FF_NUMBER      : integer range 2 to 5 := 2;  -- Number of flip-flops
       RESET_ACTIVE_STATUS : std_logic            := '1' -- '1': active high, '0': active low
    );
@@ -35,10 +35,10 @@ entity generic_reset_bridge is
 end generic_reset_bridge;
 
 architecture behavioral of generic_reset_bridge is
-   signal sync_reg : std_logic_vector(SYNC_FF_NUMBER - 1 downto 0); -- Synchronized register
 begin
 
    gen_xilinx : if (VENDOR = "XILINX") generate
+      signal sync_reg : std_logic_vector(SYNC_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS); -- Synchronized register
       -- Inline constraints
       attribute ASYNC_REG              : string;
       attribute ASYNC_REG of sync_reg  : signal is "true";
@@ -57,9 +57,12 @@ begin
    end generate gen_xilinx;
    
    gen_altera : if (VENDOR = "ALTERA") generate
+      signal sync_reg : std_logic_vector(SYNC_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS); -- Synchronized register
       -- Inline constraints
       attribute ALTERA_ATTRIBUTE             : string;
-      attribute ALTERA_ATTRIBUTE of sync_reg : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
+      attribute ALTERA_ATTRIBUTE of sync_reg : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS"" " &
+                                                "-name SDC_STATEMENT ""set_false_path -from [get_pins {reset_i}] -to [get_registers {sync_reg[" & 
+                                                integer'image(SYNC_FF_NUMBER-1) & "]}]""";
       attribute PRESERVE                     : boolean;
       attribute PRESERVE of sync_reg         : signal is true;
    begin
@@ -74,10 +77,6 @@ begin
       reset_o <= sync_reg(SYNC_FF_NUMBER - 1);  -- MSB as output
    end generate gen_altera;
 
-   gen_unsupported : if (VENDOR /= "XILINX" and VENDOR /= "ALTERA") generate
-      reset_o <= '0';
-   end generate gen_unsupported;
-  
    -- Simulation assertions (Assertions are not compatible with synthesis, so we use synthesis translate_off/on)
    -- synthesis translate_off
    assert (VENDOR = "XILINX" or VENDOR = "ALTERA") report "Unsupported vendor: " & VENDOR severity failure;
