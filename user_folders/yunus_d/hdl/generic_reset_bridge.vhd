@@ -50,7 +50,10 @@ signal sync_regs : std_logic_vector(SYNCH_FF_NUMBER -1 downto 0) := (others => (
 attribute PRESERVE : boolean;
 attribute PRESERVE of sync_regs : signal is true;
 attribute ALTERA_ATTRIBUTE : string;
-attribute ALTERA_ATTRIBUTE of sync_regs : signal is "-name SYNCHRONIZER_IDENTIFICATION FORCED";
+attribute ALTERA_ATTRIBUTE of sync_regs : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED"";"&
+																	"-name SDC_STATEMENT ""set_false_path -from [get_ports rst_in]"";" &
+																	"-name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH " & integer'image(SYNCH_FF_NUMBER-1);
+
 begin
 	process(clk, rst_in) begin
 		if(rst_in=RESET_ACTIVE_STATUS) then
@@ -61,5 +64,4 @@ begin
 	end process;
 	rst_out <= sync_regs(SYNCH_FF_NUMBER -1 );
 end generate ALTERA_GEN;
-
 end behavioral;

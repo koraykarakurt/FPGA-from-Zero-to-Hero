@@ -44,19 +44,22 @@ process(clk)
 end generate XILINX_GEN;
 
 ALTERA_GEN : if VENDOR = "altera" generate
-signal sync_regs : std_logic_vector(SYNCH_FF_NUMBER -1 downto 0) := (others => ('0')); 
-attribute PRESERVE : boolean;
-attribute PRESERVE of sync_regs : signal is true;
-attribute ALTERA_ATTRIBUTE : string;
-attribute ALTERA_ATTRIBUTE of sync_regs : signal is "-name SYNCHRONIZER_IDENTIFICATION FORCED";
+	signal sync_regs : std_logic_vector(SYNCH_FF_NUMBER -1 downto 0) := (others => ('0')); 
+	attribute PRESERVE : boolean;
+	attribute PRESERVE of sync_regs : signal is true;
+	attribute ALTERA_ATTRIBUTE : string;
+	attribute ALTERA_ATTRIBUTE of sync_regs : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED"";"&
+																		"-name SDC_STATEMENT ""set_false_path -from [get_pins data_in]"";" &
+																		"-name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH " & integer'image(SYNCH_FF_NUMBER-1);
 begin
-process(clk) 
-   begin
-      if(rising_Edge(clk)) then
-         sync_regs <= sync_regs(SYNCH_FF_NUMBER-2 downto 0) & data_in;
-      end if;
-   end process;
-   data_out <= sync_regs(SYNCH_FF_NUMBER-1);
+	process(clk) 
+		begin
+			if(rising_edge(clk)) then
+				sync_regs <= sync_regs(SYNCH_FF_NUMBER-2 downto 0) & data_in;
+			end if;
+	end process;
+	data_out <= sync_regs(SYNCH_FF_NUMBER-1);
 end generate ALTERA_GEN;
+
 end behavioral;
 
