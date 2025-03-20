@@ -1,0 +1,120 @@
+\documentclass{article}
+\usepackage{graphicx} % For including diagrams
+\usepackage{amsmath}  % For mathematical equations
+\usepackage{amssymb}  % For additional math symbols
+\usepackage{hyperref} % For hyperlinks
+\usepackage{listings} % For code snippets
+
+\title{Understanding Metastability in FPGAs}
+\author{Mert Ecevit}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\newpage % Forces a page break to separate the title page
+
+\begin{abstract}
+A condition known as metastability occurs when a signal is passed across circuits in unrelated or asynchronous clock domains, which can lead to system failure in FPGAs. This document abstracts the \textsc{Altera} white paper named "Understanding Metastability in FPGAs".
+\end{abstract}
+
+\section{Introduction}
+\begin{itemize}
+    \item Importance of timing in digital circuits
+    \item Definition of metastability
+    \item Why metastability is a concern in FPGAs
+\end{itemize}
+To ensure reliable operation, a register's input must be constant for a predetermined period of time before and after the clock edge. If a data signal transition does not satisfy the setup-time or hold-time requirements of the register, the output of the register may enter a metastable situation. A steady, defined state is frequently returned rapidly by registers.\cite{altera_metastability}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/Ekran görüntüsü 2025-03-19 175615.png}
+    \caption{Visualisation of Metastability}
+    \label{fig:enter-label}
+\end{figure}
+
+\section{Metastability in FPGA Designs}
+\begin{itemize}
+    \item Impact on synchronous and asynchronous designs
+    \item Cross-domain clock transfer challenges
+    \item Examples of metastability issues in FPGA circuits
+\end{itemize}
+After beginning in a low state, the data output signal becomes metastable and oscillates between high and low states.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/Ekran görüntüsü 2025-03-19 182526.png}
+    \caption{Example of Metastable Output Signals}
+    \label{fig:enter-label}
+\end{figure}
+
+\section{Mitigation Techniques}
+\begin{itemize}
+    \item Use of multi-stage synchronizers
+    \item Handshaking protocols
+    \item FIFO-based solutions
+    \item CDC (Clock Domain Crossing) design best practices
+\end{itemize}
+The metastable signal has no adverse effect on system operation if the data output signal resolves to a legitimate state prior to the subsequent register capturing the data. However, the system may fail if the metastable signal does not resolve to a low or high state before it reaches the next design register.
+
+\section{Practical Considerations and Simulations}
+\begin{itemize}
+    \item Simulation of metastability events
+    \item Measuring MTBF (Mean Time Between Failures)
+    \item FPGA vendor-specific solutions (Xilinx, Intel, etc.)
+\end{itemize}
+A signal must be synchronized to a new clock domain before it can be utilized as it moves across circuitry in unrelated or asynchronous clock domains. To overcome failures, a synchronizer chain is employed. The time available for a metastable signal to settle is known as the metastability settling time, and it is found in the timing slack present in the synchronizer register to register routes.
+
+\begin{itemize}
+    \item The registers in the chain are all clocked by the same or phase-related clocks.
+    \item The first register in the chain is driven from an unrelated clock domain, or asynchronously.
+    \item Each register fans out to only one register, except the last register in the chain.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/Ekran görüntüsü 2025-03-19 183422.png}
+    \caption{Synchronizer Chain}
+    \label{fig:enter-label}
+\end{figure}
+
+The calculation of the MTBF is:
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\linewidth]{Figures/Ekran görüntüsü 2025-03-19 183702.png}
+    \caption{Formula for Calculating MTBF}
+    \label{fig:enter-label}
+\end{figure}
+
+\begin{itemize}
+    \item \( C_1, C_2 \) are constants.
+    \item \( f_{\text{clk}} \) is the clock frequency.
+    \item \( f_{\text{data}} \) is the toggling frequency of the asynchronous input data signal.
+    \item \( t_{\text{met}} \) is the available metastability settling time or timing slack available beyond the register’s \( t_{\text{co}} \).
+\end{itemize}
+
+\section{Characterizing Metastability Constants}
+FPGA vendors can characterize the FPGA for metastability in order to identify the constant parameters in the MTBF equation. When testing MTBF under unrealistic circumstances, a test circuit may be employed. A test circuit is available for the characterizing constants.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/Ekran görüntüsü 2025-03-19 184432.png}
+    \caption{A Test Circuit for Calculating MTBF}
+    \label{fig:enter-label}
+\end{figure}
+There are two separate clocks in this design. Every clock cycle, the synchronizer's data input toggles (\( f_{\text{data}} \)). There are two locations for the synchronizing register. The output of the synchronizer is recorded in destination registers one clock cycle and one half-clock cycle later. The circuit recognizes that the sample signals are distinct and emits an error signal if the signal becomes metastable before resolving at the subsequent clock edge. A significant percentage of the metastability events that take place at the half-clock cycle time are detected by this circuitry. A logarithmic scale is used to illustrate the MTBF versus \( t_{\text{met}} \) results of the test conducted with various clock frequencies. The \( C_1 \) constant scales linearly, while the \( C_2 \) constant responds to the trend line's slope.
+
+\section{Conclusion}
+\begin{itemize}
+    \item Summary of key points
+    \item Best practices for FPGA designers
+\end{itemize}
+Due to the exponential term \( e^{t_{\text{met}} / C_2} \), it has the largest effect on MTBF. The \( C_2 \) constant depends on the technology used to manufacture the device, with faster technologies generally having different characteristics. In most cases, metastability is not the main concern for designers.
+
+To improve metastability MTBF, designers can increase \( t_{\text{met}} \) by adding extra register stages to the synchronizer chain. A three-stage synchronizer is typically recommended.
+
+\newpage
+\bibliographystyle{ieeetr}
+\bibliography{references} % Add your references in a 'references.bib' file
+
+\end{document}
