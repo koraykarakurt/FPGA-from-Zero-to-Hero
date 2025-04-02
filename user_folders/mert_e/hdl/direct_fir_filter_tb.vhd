@@ -58,7 +58,7 @@ architecture behavioral of direct_fir_filter_tb is
    signal valid_out      : std_logic;
 
 begin
-   dut : entity work.fully_parallel_systolic_fir_filter
+   dut : entity work.direct_fir_filter
       generic map (
          number_of_taps => number_of_taps,
          input_width    => input_width,
