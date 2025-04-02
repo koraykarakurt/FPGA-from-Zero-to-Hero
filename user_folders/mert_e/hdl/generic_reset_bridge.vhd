@@ -23,7 +23,7 @@ entity async_reset_synchronizer is
     generic (
         VENDOR              : string               := "GOWIN"; -- "XILINX", "ALTERA", "GOWIN"
         RESET_ACTIVE_STATUS : std_logic            := '1';      -- '0': active low, '1': active high
-        ASYNCH_FF_NUMBER     : natural range 2 to 5 := 2         
+        ASYNCH_FF_NUMBER     : natural range 2 to 5 := 3        
     );
     port (
         clk     : in std_logic;
@@ -34,65 +34,65 @@ end entity async_reset_synchronizer;
 
 architecture behavioral of async_reset_synchronizer is
 
-    signal async_chain : std_logic_vector(SYNCH_FF_NUMBER-1 downto 0) := (others => (not RESET_ACTIVE_STATUS));
+    signal async_chain : std_logic_vector(ASYNCH_FF_NUMBER-1 downto 0) := (others => (not RESET_ACTIVE_STATUS));
 
 begin
 
-    -- Xilinx-specific implementation
-    xilinx_impl : if VENDOR = "XILINX" generate
-        attribute ASYNC_REG                 : string;
-        attribute ASYNC_REG  of Sync_Reg      : signal is "true";
-        attribute DONT_TOUCH             : string;
-        attribute DONT_TOUCH of Sync_Reg  : signal is "no";
-    begin
-        proc_xilinx_sync : process (clk, rst_in)
-        begin
-            if rst_in = RESET_ACTIVE_STATUS then
-                async_chain <= (others => RESET_ACTIVE_STATUS);
-            elsif rising_edge(clk) then
-                async_chain <= async_chain(SYNCH_FF_NUMBER-2 downto 0) & (not RESET_ACTIVE_STATUS);
-            end if;
-        end process proc_xilinx_sync;
+    -- --Xilinx-specific implementation
+    -- xilinx_impl : if VENDOR = "XILINX" generate
+        -- attribute ASYNC_REG                 			: string;
+        -- attribute ASYNC_REG  of async_chain      	: signal is "true";
+        -- attribute DONT_TOUCH             			: string;
+        -- attribute DONT_TOUCH of async_chain  		: signal is "no";
+    -- begin
+        -- proc_xilinx_sync : process (clk, rst_in)
+        -- begin
+            -- if rst_in = RESET_ACTIVE_STATUS then
+                -- async_chain <= (others => RESET_ACTIVE_STATUS);
+            -- elsif rising_edge(clk) then
+                -- async_chain <= async_chain(SYNCH_FF_NUMBER-2 downto 0) & (not RESET_ACTIVE_STATUS);
+            -- end if;
+        -- end process proc_xilinx_sync;
 
-        rst_out <= async_chain(SYNCH_FF_NUMBER-1);
-    end generate xilinx_impl;
+        -- rst_out <= async_chain(SYNCH_FF_NUMBER-1);
+    -- end generate xilinx_impl;
 
-    -- Intel-specific implementation
-    altera_impl : if VENDOR = "ALTERA" generate
-        attribute ALTERA_ATTRIBUTE             : boolean;
-        attribute ALTERA_ATTRIBUTE of Sync_Reg : signal is true;
-        attribute DONT_MERGE                   : boolean;
-        attribute DONT_MERGE of Sync_Reg       : signal is true;
-        attribute PRESERVE                     : boolean;
-        attribute PRESERVE of Sync_Reg         : signal is true;
-    begin
-        proc_altera_sync : process (clk, rst_in)
-        begin
-            if rst_in = RESET_ACTIVE_STATUS then
-                async_chain <= (others => RESET_ACTIVE_STATUS);
-            elsif rising_edge(clk) then
-                async_chain <= async_chain(SYNCH_FF_NUMBER-2 downto 0) & (not RESET_ACTIVE_STATUS);
-            end if;
-        end process proc_altera_sync;
+    -- --Intel-specific implementation
+    -- altera_impl : if VENDOR = "ALTERA" generate
+        -- attribute ALTERA_ATTRIBUTE             		: boolean;
+        -- attribute ALTERA_ATTRIBUTE of async_chain 	: signal is true;
+        -- attribute DONT_MERGE                   		: boolean;
+        -- attribute DONT_MERGE of async_chain       	: signal is true;
+        -- attribute PRESERVE                     		: boolean;
+        -- attribute PRESERVE of async_chain         	: signal is true;
+    -- begin
+        -- proc_altera_sync : process (clk, rst_in)
+        -- begin
+            -- if rst_in = RESET_ACTIVE_STATUS then
+                -- async_chain <= (others => RESET_ACTIVE_STATUS);
+            -- elsif rising_edge(clk) then
+                -- async_chain <= async_chain(ASYNCH_FF_NUMBER-2 downto 0) & (not RESET_ACTIVE_STATUS);
+            -- end if;
+        -- end process proc_altera_sync;
 
-        rst_out <= async_chain(SYNCH_FF_NUMBER-1);
-    end generate intel_impl;
+        -- rst_out <= async_chain(ASYNCH_FF_NUMBER-1);
+    -- end generate intel_impl;
 
     -- GOWIN-specific implementation
     gowin_impl : if VENDOR = "GOWIN" generate
         attribute SYN_PRESERVE : integer;
-        attribute SYN_PRESERVE of Synch_Reg : signal is 1;
+        attribute SYN_PRESERVE of async_chain : signal is 1;
     begin
         proc_gowin_sync : process (clk, rst_in)
         begin
             if rst_in = RESET_ACTIVE_STATUS then
                 async_chain <= (others => RESET_ACTIVE_STATUS);
             elsif rising_edge(clk) then
-                async_chain <= async_chain(SYNCH_FF_NUMBER-2 downto 0) & (not RESET_ACTIVE_STATUS);
+                async_chain <= async_chain(ASYNCH_FF_NUMBER-2 downto 0) & (not RESET_ACTIVE_STATUS);
             end if;
         end process proc_gowin_sync;
 
-        rst_out <= async_chain(SYNCH_FF_NUMBER-1);
+        rst_out <= async_chain(ASYNCH_FF_NUMBER-1);
     end generate gowin_impl;
 
 end architecture behavioral;
