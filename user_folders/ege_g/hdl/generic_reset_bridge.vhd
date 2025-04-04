@@ -51,7 +51,11 @@ GEN_ALTERA: if VENDOR = "ALTERA" generate
 signal ff_chain : std_logic_vector (SYNCH_FF_NUMBER-1 downto 0) := (others => RESET_ACTIVE_STATUS);
 attribute PRESERVE : boolean;
 attribute PRESERVE of ff_chain : signal is true;
-
+attribute ALTERA_ATTRIBUTE : string;
+attribute ALTERA_ATTRIBUTE : string;
+attribute ALTERA_ATTRIBUTE of ff_chain : signal is
+  "-name SYNCHRONIZER_IDENTIFICATION AUTO, -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH " & integer'image(SYNCH_FF_NUMBER-1) &
+  ", -name SDC_STATEMENT ""set_false_path -from [get_ports rst]""";
 begin
    process(clk, rst) begin
       if (rst = RESET_ACTIVE_STATUS) then

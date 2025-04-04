@@ -45,8 +45,9 @@ signal ff_chain : std_logic_vector (SYNCH_FF_NUMBER-1 downto 0) := (others => '0
 attribute PRESERVE : boolean;
 attribute ALTERA_ATTRIBUTE : string;
 attribute PRESERVE of ff_chain : signal is true;
-attribute altera_attribute of ff_chain : signal is
-   "-name SYNCHRONIZER_IDENTIFICATION AUTO, -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH 4";
+attribute ALTERA_ATTRIBUTE of ff_chain : signal is
+  "-name SYNCHRONIZER_IDENTIFICATION AUTO, -name SYNCHRONIZATION_REGISTER_CHAIN_LENGTH " & integer'image(SYNCH_FF_NUMBER-1) &
+  ", -name SDC_STATEMENT ""set_false_path -to [get_pins ff_chain[3]/D]""";
    --AUTO: Quartus automatically detects the chain
 begin
    process(clk) begin
