@@ -23,7 +23,7 @@ use work.fir_filter_coeff.all;
 
 entity direct_fir_filter is
    generic (
-      number_of_taps        : integer := 16; 
+      number_of_taps        : integer := 4; 
       input_width           : natural := 18;
       coeff_width           : natural := 18;
       output_width          : natural := 54 -- guard_bits = 54 - 18 - 18 = 18
@@ -33,7 +33,7 @@ entity direct_fir_filter is
       rst                   : in  std_logic;
       valid_in              : in  std_logic;
       data_in               : in  std_logic_vector(input_width-1 downto 0);
-      coeff_pipe            : in pipeline_coeffs;
+      coeff_pipe            : in  pipeline_coeffs;
       data_out              : out std_logic_vector(output_width-1 downto 0);
       valid_out             : out std_logic
    );
