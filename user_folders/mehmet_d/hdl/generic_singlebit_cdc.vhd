@@ -42,27 +42,29 @@ begin
          end if;
       end process xilinx;
       data_sync <= data_reg(SYNCH_FF_NUMBER - 1); -- assing MSb data to out
+   end;
    end generate xilinx_gen;
 
    -- altera process
-   altera_gen : if VENDOR = "altera" generate
-      signal data_reg : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0);
-      -- altera attributes
-      attribute ALTERA_ATTRIBUTE             : string;
-      attribute ALTERA_ATTRIBUTE of data_reg : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
-      attribute DONT_MERGE                   : boolean;
-      attribute DONT_MERGE of data_reg       : signal is true;
-      attribute PRESERVE                     : boolean;
-      attribute PRESERVE of data_reg         : signal is true;
-   begin
-      altera : process (clk)
-      begin
-         if rising_edge(clk) then
-            data_reg <= data_reg(SYNCH_FF_NUMBER - 2 downto 0) & data_async; -- shift left
-         end if;
-      end process altera;
-      data_sync <= data_reg(SYNCH_FF_NUMBER - 1); -- assing MSb data to out
-   end generate altera_gen;
+   --altera_gen : if VENDOR = "altera" generate
+   --   signal data_reg : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0);
+   --   -- altera attributes
+   --   attribute ALTERA_ATTRIBUTE             : string;
+   --   attribute ALTERA_ATTRIBUTE of data_reg : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
+   --   attribute DONT_MERGE                   : boolean;
+   --   attribute DONT_MERGE of data_reg       : signal is true;
+   --   attribute PRESERVE                     : boolean;
+   --   attribute PRESERVE of data_reg         : signal is true;
+   --begin
+   --   altera : process (clk)
+   --   begin
+   --      if rising_edge(clk) then
+   --         data_reg <= data_reg(SYNCH_FF_NUMBER - 2 downto 0) & data_async; -- shift left
+   --      end if;
+   --   end process altera;
+   --   data_sync <= data_reg(SYNCH_FF_NUMBER - 1); -- assing MSb data to out
+   --end;
+   --end generate altera_gen;
 
    -- efinity process
    efinity_gen : if VENDOR = "efinity" generate
@@ -82,6 +84,7 @@ begin
          end if;
       end process efinity;
       data_sync <= data_reg(SYNCH_FF_NUMBER - 1); -- assing MSb data to out
+   end;
    end generate efinity_gen;
 
    -- microchip process
@@ -93,7 +96,7 @@ begin
       attribute SYN_PRESERVE             : boolean;
       attribute SYN_PRESERVE of data_reg : signal is true;
       attribute ALSPRESERVE              : boolean;
-      attribute ALSPRESERVE of rst_reg   : signal is true;
+      attribute ALSPRESERVE of data_reg  : signal is true;
    begin
       microchip : process (clk)
       begin
@@ -102,6 +105,7 @@ begin
          end if;
       end process microchip;
       data_sync <= data_reg(SYNCH_FF_NUMBER - 1); -- assing MSb data to out
+   end;
    end generate microchip_gen;
 
    -- lattice process
@@ -120,6 +124,7 @@ begin
          end if;
       end process lattice;
       data_sync <= data_reg(SYNCH_FF_NUMBER - 1); -- assing MSb data to out
+   end;
    end generate lattice_gen;
 
 end behavioral;

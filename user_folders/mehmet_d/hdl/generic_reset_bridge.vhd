@@ -44,30 +44,32 @@ begin
             rst_reg <= rst_reg(SYNCH_FF_NUMBER - 2 downto 0) & (not RESET_ACTIVE_STATUS); -- shift left
          end if;
       end process xilinx;
-      rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out      
+      rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out
+   end;    
    end generate xilinx_gen;
 
    -- altera process
-   altera_gen : if VENDOR = "altera" generate
-      signal rst_reg : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS);
-      -- altera attributes
-      attribute ALTERA_ATTRIBUTE            : string;
-      attribute ALTERA_ATTRIBUTE of rst_reg : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
-      attribute DONT_MERGE                  : boolean;
-      attribute DONT_MERGE of rst_reg       : signal is true;
-      attribute PRESERVE                    : boolean;
-      attribute PRESERVE of rst_reg         : signal is true;
-   begin
-      altera : process (clk, rst_in)
-      begin
-         if rst_in = RESET_ACTIVE_STATUS then
-            rst_reg <= (others => RESET_ACTIVE_STATUS);
-         elsif rising_edge(clk) then
-            rst_reg <= rst_reg(SYNCH_FF_NUMBER - 2 downto 0) & (not RESET_ACTIVE_STATUS); -- shift left
-         end if;
-      end process altera;
-      rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out
-   end generate altera_gen;
+   --altera_gen : if VENDOR = "altera" generate
+   --   signal rst_reg : std_logic_vector(SYNCH_FF_NUMBER - 1 downto 0) := (others => RESET_ACTIVE_STATUS);
+   --   -- altera attributes
+   --   attribute ALTERA_ATTRIBUTE            : string;
+   --   attribute ALTERA_ATTRIBUTE of rst_reg : signal is "-name SYNCHRONIZER_IDENTIFICATION ""FORCED IF ASYNCHRONOUS""";
+   --   attribute DONT_MERGE                  : boolean;
+   --   attribute DONT_MERGE of rst_reg       : signal is true;
+   --   attribute PRESERVE                    : boolean;
+   --   attribute PRESERVE of rst_reg         : signal is true;
+   --begin
+   --   altera : process (clk, rst_in)
+   --   begin
+   --      if rst_in = RESET_ACTIVE_STATUS then
+   --         rst_reg <= (others => RESET_ACTIVE_STATUS);
+   --      elsif rising_edge(clk) then
+   --         rst_reg <= rst_reg(SYNCH_FF_NUMBER - 2 downto 0) & (not RESET_ACTIVE_STATUS); -- shift left
+   --      end if;
+   --   end process altera;
+   --   rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out
+   --end;
+   --end generate altera_gen;
 
    -- microchip process
    microchip_gen : if VENDOR = "microchip" generate
@@ -89,6 +91,7 @@ begin
          end if;
       end process microchip;
       rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out
+   end;
    end generate microchip_gen;
 
    -- efinity process
@@ -112,6 +115,7 @@ begin
          end if;
       end process efinity;
       rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out
+   end;
    end generate efinity_gen;
 
    -- lattice process
@@ -132,6 +136,7 @@ begin
          end if;
       end process lattice;
       rst_out <= rst_reg(SYNCH_FF_NUMBER - 1); -- assing MSb to out
+   end;
    end generate lattice_gen;
 
 end behavioral;
