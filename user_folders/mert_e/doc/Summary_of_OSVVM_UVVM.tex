@@ -1,0 +1,357 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{OSVVM and UVVM Summary}
+\author{Mert Ecevit}
+\date{April 2025}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section*{OSVVM Methodology}
+\subsection{OSVVM Verification Framework}
+
+Looks identical to a SystemVerilog framework:
+
+\begin{itemize}
+  \item \textbf{Test sequencer (\texttt{TestCtrl})} calls transactions = \textit{test case}
+  \item Each test case is a separate \textbf{architecture} of \texttt{TestCtrl}
+  \item \textbf{Verification components (VC)} implement \textit{interface signaling}
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/verification_framework.png}
+    \caption{OSVVM VERIFICATON FRAMEWORK}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsubsection{Elements}
+
+\begin{itemize}
+    \item Transaction Interface + Transaction API
+    \item Verification Components
+    \item Test Sequencer
+\end{itemize}
+
+\subsection{Transaction Interfaces and APIs}
+
+Transaction interfaces written with VHDL record types and Transaction APIs written with VHDL procedures. 
+
+\begin{itemize}
+    \item The record is "inout" port
+    \item Long term plan of for this part is to migrate VHDL-2019 Interfaces
+\end{itemize}
+
+Model Independent Transactions (MIT) define standardized interfaces and APIs that can be applied across multiple related protocols. 
+
+For example, the \textbf{Address Bus MIT} is designed for memory-mapped interfaces such as AXI4 and Avalon, while the \textbf{Stream MIT} supports stream-based protocols like AXI Stream and UART. 
+
+By using MIT-based Verification Components, the development of test case components becomes significantly more efficient and consistent.
+
+
+\subsection{Test Sequencer = TestCtrl}
+
+\begin{itemize}
+  \item All test logic is kept in a single file for simplicity and maintainability.
+  \item A control process governs the test execution flow, managing initialization and finalization.
+  \item Each interface is assigned a separate process, enabling concurrency similar to the design.
+  \item Each interface process is responsible for handling its own set of transactions.
+  \item Test scenarios are constructed as sequences of transaction calls.
+  \item The architecture supports the integration of:
+  \begin{itemize}
+    \item Directed tests,
+    \item Constrained-random testing,
+    \item Scoreboards for checking results,
+    \item Functional coverage collection.
+  \end{itemize}
+  \item Synchronization mechanisms ensure proper coordination among parallel processes.
+  \item Error reporting and messaging are included to assist in debugging and traceability.
+\end{itemize}
+
+\subsection{Constrained Random Testing}
+
+\begin{itemize}
+  \item Efficiently produces realistic stimuli suitable for driving the design under test.
+  \item Well-suited for scenarios involving numerous similar or repeated structures.
+  \item Capable of handling various types of data and operations such as:
+  \begin{itemize}
+    \item Operational modes,
+    \item Instruction sequences,
+    \item Network packet flows,
+    \item Processor-level command execution.
+  \end{itemize}
+\end{itemize}
+
+OSVVM has a Randomized Library to test and check. It is more easy to detect the errors.
+
+\subsubsection{Scoreboards}
+Self-checking when data is minimally transformed.
+
+\begin{itemize}
+  \item A built-in verification mechanism is used to ensure correct data transformations.
+  \item This is typically implemented through customized FIFOs that include automatic checking logic.
+  \item It is designed to be flexible by using package-level generics, allowing compatibility with various data types.
+  \item The system supports advanced behaviors such as handling out-of-order data processing and managing dropped or lost values.
+\end{itemize}
+
+\subsection{Functional Coverage}
+
+\begin{itemize}
+  \item Cross coverage monitors how independent elements relate to one another.
+  \item For example, it helps determine whether each register set has been tested with every ALU input.
+  \item It involves writing code that checks whether key items in the test plan are being exercised.
+  \item It ensures coverage of requirements, features, and edge conditions.
+  \item Item coverage, also known as point coverage, focuses on variation within a single object.
+  \item An example is categorizing transfer sizes into bins such as: 1, 2, 3, 4--127, 128--252, 253, 254, and 255.
+  \item The purpose is to track what the randomized testing actually stimulated.
+  \item A test is considered complete when both functional coverage and code coverage reach 100\%.
+  \item Code coverage alone is not sufficient.
+  \item Code coverage only reflects which lines of code were executed.
+  \item It fails to capture conditions outside the code itself, such as bin coverage or uncorrelated combinations.
+\end{itemize}
+
+\subsection{Scripting System}
+
+\begin{itemize}
+  \item Designed to be compatible with various simulators, ensuring platform-independent usage.
+  \item Provide automation for tasks such as library setup, code compilation, and simulation execution.
+  \item Support a wide range of simulators including GHDL, NVC, Aldec, Siemens, Synopsys VCS, and Cadence Xcelium.
+  \item Scripts are structured in a modular way to enhance reusability and maintainability.
+\end{itemize}
+
+\subsection{Reporting Features}
+
+\begin{itemize}
+    \item Mini-Report in Text Format
+    \item Detailed HTML Report
+    \begin{itemize}
+        \item Overview of the complete build process
+        \item Breakdown for each test suite
+        \item Individual test case summaries within suites
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{1. Build Summary Report (HTML Format)}
+\begin{itemize}
+    \item Comprehensive overview of the complete build execution
+    \item Summarized results for all test suites and individual test cases
+    \item Direct access points to in-depth test documentation
+\end{itemize}
+
+\subsubsection*{2. Detailed Test Case Documentation (HTML)}
+\begin{itemize}
+    \item System alert documentation highlighting errors and warnings
+    \item Coverage analysis reports for functional verification
+    \item Verification scoreboard results
+    \item Quick-access links to simulation output transcripts
+\end{itemize}
+
+\subsubsection*{3. Enhanced Simulation Transcript (HTML)}
+\begin{itemize}
+    \item Critical errors prominently displayed in red
+    \item Expandable/collapsible content sections
+    \item Optimized for rapid analysis of extensive output logs
+\end{itemize}
+
+\subsubsection*{4. Requirements Verification Report}
+\begin{itemize}
+    \item Clear visualization of requirements coverage status
+\end{itemize}
+
+\section*{UVVM Methodology}
+What is UVVM?
+\begin{itemize}
+    \item A comprehensive VHDL verification framework and methodology
+    \item Freely available under open-source licensing
+    \item Features well-organized system architecture and infrastructure
+    \item Delivers substantial improvements in verification productivity
+    \item Enhances final design quality and reliability
+    \item Doulos-recommended approach for testbench development
+    \item Currently being expanded through ESA (European Space Agency) initiatives
+    \item IEEE Standards Association open-source development project
+    \item Compatible with all VHDL-2008 compliant simulation tools
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/uvvm_table.png}
+    \caption{UVVM System}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsection{Utilities}
+\begin{itemize}
+    \item \texttt{check\_stable()}
+    \item \texttt{await\_stable()}
+    \item \texttt{clock\_generator()}
+    \item \texttt{adjustable\_clock\_generator()}
+    \item \texttt{random()}
+    \item \texttt{randomize()}
+    \item \texttt{gen\_pulse()}
+    \item \texttt{block\_flag()}
+    \item \texttt{unblock\_flag()}
+    \item \texttt{await\_unblock\_flag()}
+    \item \texttt{await\_barrier()}
+    \item \texttt{enable\_log\_msg()}
+    \item \texttt{disable\_log\_msg()}
+    \item \texttt{to\_string()}
+    \item \texttt{fill\_string()}
+    \item \texttt{to\_upper()}
+    \item \texttt{replace()}
+    \item \texttt{normalize\_and\_check()}
+    \item \texttt{set\_log\_file\_name()}
+    \item \texttt{set\_alert\_file\_name()}
+    \item \texttt{wait\_until\_given\_time\_after\_rising\_edge()}
+\end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{Figures/data_comm.png}
+    \caption{Simple Data Communication}
+    \label{fig:enter-label}
+\end{figure}
+
+\subsection{Bus Functional Models(BFMs)}
+\begin{itemize}
+    \item \textbf{Advantages for Simple Testbenches:}
+    \begin{itemize}
+        \item Implemented as specialized procedures in dedicated packages
+        \item Straightforward invocation from any process
+    \end{itemize}
+    
+    \item \textbf{Limitations:}
+    \begin{itemize}
+        \item Processes have sequential execution constraints
+        \item Can only perform one BFM operation at a time
+        \item Cannot simultaneously execute multiple BFMs or other operations
+    \end{itemize}
+    
+    \item \textbf{Solution for Concurrent Operations:}
+    \begin{itemize}
+        \item Requires implementation as separate entities/components
+        \item Verification Components (VCs) provide this capability
+    \end{itemize}
+\end{itemize}
+
+\subsection{VHDL Verification Components(VVCs)}
+VVCs enhance traditional BFMs with advanced capabilities through a structured design:
+
+\subsubsection*{Core Components}
+\begin{itemize}
+    \item \textbf{Command Interpreter:} Analyzes and decodes incoming commands
+    \item \textbf{Command Queue:} Manages pending operations in FIFO order  
+    \item \textbf{Command Executor:} Processes commands using the underlying BFM
+\end{itemize}
+
+\subsubsection*{Advanced Features}
+\begin{itemize}
+    \item Configurable delays between commands for timing verification
+    \item Queue management for handling multiple concurrent operations
+    \item Automatic detection of command sequence completion
+    \item Real-time interface activity monitoring
+    \item Multicast/broadcast support for multi-agent control
+    \item Detailed transaction logging and reporting
+    \item Built-in sequencers for protocol automation
+\end{itemize}
+
+\subsubsection*{Extension Capabilities}
+\begin{itemize}
+    \item Plug-in protocol checkers (timing, framing, intervals)
+    \item Custom sequence generator integration
+    \item Support for complex transactions:
+    \begin{itemize}
+        \item Split transactions
+        \item Out-of-order execution
+    \end{itemize}
+\end{itemize}
+
+\subsection{Advanced Functions of UVVM}
+
+\begin{itemize}
+    \item \textbf{Scoreboards} - Verification data checking
+    \item \textbf{Monitors} - Interface activity observation
+    \item \textbf{Randomization Control} - Functional coverage management
+    \item \textbf{Error Injection}:
+    \begin{itemize}
+        \item Brute force methods
+        \item Protocol-aware techniques
+    \end{itemize}
+    \item \textbf{Local Sequencers} - Command sequence automation
+    \item \textbf{Property Checkers} - Protocol rule verification
+    \item \textbf{Transaction Info} - Detailed operation logging
+    \item \textbf{Watchdogs}:
+    \begin{itemize}
+        \item Simple timeout detection
+        \item Activity-based monitoring
+    \end{itemize}
+    \item \textbf{Hierarchical VVCs} - With integrated scoreboards
+    \item \textbf{Specification Coverage} - Requirements-to-test tracing
+\end{itemize}
+
+\subsection{Specification Coverage}
+
+\subsubsection*{Verification Steps}
+\begin{enumerate}
+    \item Specify all requirements
+    \item Report coverage from test sequencers (or other testbench components)
+    \item Generate summary reports
+\end{enumerate}
+
+\subsubsection*{Coverage Reporting}
+\begin{itemize}
+    \item Coverage metrics per individual requirement
+    \item Test cases associated with each requirement
+    \item Requirements verified by each test case
+    \item Cumulative coverage across multiple test cases
+\end{itemize}
+
+\subsection{2nd ESA Project}
+\begin{itemize}
+    \item \textbf{Advanced randomization} implemented with simple interface
+    
+    \begin{itemize}
+        \item \textbf{Optimized Randomization}:
+        \begin{itemize}
+            \item Randomization without replacement
+            \item Weighted according to:
+            \begin{itemize}
+                \item Target distribution
+                \item Previous events
+            \end{itemize}
+            \item Achieves the lowest number of randomizations needed for a given target
+        \end{itemize}
+        
+        \item \textbf{Functional Coverage}:
+        \begin{itemize}
+            \item Verifies that all specified scenarios have been tested
+        \end{itemize}
+    \end{itemize}
+\end{itemize}
+
+Also the Enhanced Randomisation of UVVM is structed.
+
+\begin{itemize}
+    \item \textbf{Seamless integration} with UVVM framework
+    \begin{itemize}
+        \item Unified \textbf{alert handling} system
+        \item Consolidated \textbf{logging} mechanism
+    \end{itemize}
+    
+    \item \textbf{Enhanced clarity and usability}
+    \begin{itemize}
+        \item Intuitive \textbf{keyword system} for improved comprehension
+        \item Clean, organized output for better \textbf{overview}
+    \end{itemize}
+    
+    \item \textbf{Maintainability advantages}
+    \begin{itemize}
+        \item Modular design for \textbf{easy extension}
+        \item Straightforward \textbf{code maintenance}
+    \end{itemize}
+\end{itemize}
+
+\end{document}
