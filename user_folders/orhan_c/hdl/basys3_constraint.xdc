@@ -295,4 +295,4 @@ set_property IOSTANDARD LVCMOS33 [get_ports rst_out]
 
 
 
-set_false_path -from [get_pins {intel_path.rst_chain_reg[0]/C}] -to [get_pins {intel_path.rst_chain_reg[1]/D}]
+set_false_path -from [get_pins {xilinx_path.rst_chain_reg[0]}] -from [get_ports {rst_in}]
