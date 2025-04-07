@@ -15,7 +15,7 @@ use IEEE.STD_LOGIC_1164.all;
 entity generic_singlebit_cdc is
    generic 
    (
-      VENDOR              : string               := "intel" ; 	-- FPGA vendor name, valid values -> "xilinx", "intel"
+      VENDOR              : string               := "xilinx" ; 	-- FPGA vendor name, valid values -> "xilinx", "intel"
       SYNCH_FF_NUMBER     : natural range 2 to 3 :=  3 			-- adjust according to FPGA/SoC family, clock speed and input rate of change
 
    );
